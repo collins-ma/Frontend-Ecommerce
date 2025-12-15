@@ -1,0 +1,6 @@
+/* stylelint-disable at-rule-no-unknown */
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* stylelint-enable at-rule-no-unknown */
