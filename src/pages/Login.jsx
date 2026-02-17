@@ -5,7 +5,7 @@ import { setCredentials } from "../auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import {jwtDecode} from 'jwt-decode'
+import {jwtDecode} from "jwt-decode";
 import usePersist from "../hooks/usePersist";
 
 function Login() {
@@ -36,8 +36,16 @@ function Login() {
     }
 
     try {
-      const userData = await login({ username, password }).unwrap();
-      dispatch(setCredentials(userData));
+      const userData= await login({ username, password }).unwrap();
+      console.log("Login successful", userData);
+      // --- Handle unverified accounts ---
+      if (userData.needsVerification) {
+        navigate("/verify", { state: { email: userData.email } });
+        return;
+      }
+
+      // --- Verified: save credentials and navigate ---
+      dispatch(setCredentials(userData.accessToken));
 
       const decoded = jwtDecode(userData.accessToken);
       const roles = decoded?.roles || [];
@@ -71,7 +79,9 @@ function Login() {
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <Toaster position="top-center" reverseOrder={false} />
       <div className="bg-white shadow-xl rounded-2xl p-10 w-full max-w-md flex flex-col gap-4 text-black">
-        <h2 className="text-3xl font-bold text-center mb-6">Login to ShopVista</h2>
+        <h2 className="text-3xl font-bold text-center mb-6">
+          Login to ShopVista
+        </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
@@ -132,7 +142,10 @@ function Login() {
 
         <div className="text-center mt-4 text-gray-600">
           Don't have an account?{" "}
-          <a href="/signup" className="text-orange-500 font-semibold hover:underline">
+          <a
+            href="/signup"
+            className="text-orange-500 font-semibold hover:underline"
+          >
             Sign Up
           </a>
         </div>

@@ -1,97 +1,108 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetUserByIdQuery, useDeleteUserMutation } from "../features/users/usersApiSlice";
-import { FiTrash2 } from "react-icons/fi";
+import {
+  useGetUserByIdQuery,
+  useDeleteUserMutation,
+  useDeactivateUserMutation,
+  useActivateUserMutation,
+} from "../features/users/usersApiSlice";
+import { FiTrash2, FiUserX, FiUserCheck } from "react-icons/fi";
 
 export default function UserDetail() {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { data: user, isLoading, isError, error } = useGetUserByIdQuery(userId);
+
+  const { data: user, isLoading, isError, error } =
+    useGetUserByIdQuery(userId);
+
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
+  const [deactivateUser, { isLoading: isDeactivating }] =
+    useDeactivateUserMutation();
+  const [activateUser, { isLoading: isActivating }] =
+    useActivateUserMutation();
+
   const [showModal, setShowModal] = useState(false);
 
   if (isLoading)
-    return <div className="p-6 text-center text-gray-600 font-semibold">Loading user info...</div>;
+    return <div className="p-6 text-center">Loading user...</div>;
 
   if (isError)
-    return <div className="p-6 text-center text-red-500 font-semibold">Failed to load user: {error?.data?.message || "Unknown error"}</div>;
+    return (
+      <div className="p-6 text-center text-red-500">
+        {error?.data?.message || "Failed to load user"}
+      </div>
+    );
 
   if (!user)
-    return <div className="p-6 text-center text-gray-500 italic">User not found.</div>;
+    return <div className="p-6 text-center">User not found</div>;
 
   const handleDelete = async () => {
-    try {
-      await deleteUser(user._id).unwrap();
-      setShowModal(false);
-      navigate("/users");
-    } catch (err) {
-      console.error("Failed to delete user: ", err);
-      alert(err?.data?.message || "Failed to delete user");
-    }
+    await deleteUser(user._id).unwrap();
+    navigate("/users");
+  };
+
+  const handleDeactivate = async () => {
+    await deactivateUser(user._id).unwrap();
+  };
+
+  const handleActivate = async () => {
+    await activateUser(user._id).unwrap();
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      {/* Delete Button */}
-      <div className="flex justify-end mb-6">
+      {/* ACTION BUTTONS */}
+      <div className="flex justify-end gap-3 mb-6">
+        {user.isActive ? (
+          <button
+            onClick={handleDeactivate}
+            disabled={isDeactivating}
+            className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg"
+          >
+            <FiUserX />
+            {isDeactivating ? "Deactivating..." : "Deactivate"}
+          </button>
+        ) : (
+          <button
+            onClick={handleActivate}
+            disabled={isActivating}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg"
+          >
+            <FiUserCheck />
+            {isActivating ? "Activating..." : "Activate"}
+          </button>
+        )}
+
         <button
           onClick={() => setShowModal(true)}
-          disabled={isDeleting}
-          className="inline-flex items-center gap-1 px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg"
         >
-          <FiTrash2 /> Delete User
+          <FiTrash2 /> Delete
         </button>
       </div>
 
-      {/* User Info Table */}
-      <div className="overflow-x-auto bg-white shadow-xl rounded-2xl p-6">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Username</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Roles</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">User ID</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            <tr className="hover:bg-gray-50">
-              <td className="px-6 py-4 text-gray-800 font-medium">{user.username}</td>
-              <td className="px-6 py-4 text-gray-800">{user.email?.trim() || <span className="italic text-gray-400">No email</span>}</td>
-              <td className="px-6 py-4 text-gray-800">
-                {Array.isArray(user.roles) && user.roles.length > 0 ? (
-                  <div className="flex flex-wrap gap-1">
-                    {user.roles.map((role) => (
-                      <span key={role} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold">{role}</span>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="bg-gray-200 text-gray-600 px-2 py-1 rounded-full text-xs italic">No roles</span>
-                )}
-              </td>
-              <td className="px-6 py-4 text-gray-800">{user._id}</td>
-            </tr>
-          </tbody>
-        </table>
+      {/* USER INFO */}
+      <div className="bg-white shadow-xl rounded-xl p-6">
+        <p><strong>Username:</strong> {user.username}</p>
+        <p><strong>Email:</strong> {user.email || "—"}</p>
+        <p><strong>Status:</strong> {user.isActive ? "Active" : "Deactivated"}</p>
+        <p><strong>User ID:</strong> {user._id}</p>
       </div>
 
-      {/* Modal */}
+      {/* DELETE MODAL */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-96">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Confirm Delete</h2>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete <span className="font-medium">{user.username}</span>?</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h2 className="font-semibold mb-4">Confirm Delete</h2>
+            <p className="mb-6">
+              Delete <strong>{user.username}</strong>?
+            </p>
             <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
-              >
-                Cancel
-              </button>
+              <button onClick={() => setShowModal(false)}>Cancel</button>
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                className="bg-red-600 text-white px-4 py-2 rounded"
               >
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>
