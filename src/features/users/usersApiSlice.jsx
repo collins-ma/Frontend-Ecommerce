@@ -11,13 +11,12 @@ const initialState = usersAdapter.getInitialState();
 
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+
     // Fetch all users
     getUsers: builder.query({
       query: () => "/users",
-      
-      transformResponse: (responseData) => {
-        return usersAdapter.setAll(initialState, responseData);
-      },
+      transformResponse: (responseData) =>
+        usersAdapter.setAll(initialState, responseData),
       providesTags: (result) =>
         result
           ? [
@@ -27,10 +26,9 @@ export const usersApiSlice = apiSlice.injectEndpoints({
           : [{ type: "Users", id: "LIST" }],
     }),
 
-    // Fetch single user by ID
+    // Fetch single user
     getUserById: builder.query({
       query: (id) => `/users/${id}`,
-      transformResponse: (responseData) => responseData, // single user, no adapter
       providesTags: (result, error, id) => [{ type: "Users", id }],
     }),
 
@@ -54,23 +52,52 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    resendCode:builder.mutation({
-      query:(body)=>({
-        url:'users/resend-code',
-        method:'POST',
+    resendCode: builder.mutation({
+      query: (body) => ({
+        url: "/users/resend-code",
+        method: "POST",
         body,
-      })
+      }),
     }),
 
     forgotPassword: builder.mutation({
       query: (email) => ({
-        url: '/auth/forgot-password',
-        method: 'POST',
+        url: "/auth/forgot-password",
+        method: "POST",
         body: { email },
       }),
     }),
 
-    // Update user
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: '/auth/change-password',
+        method: 'PATCH',
+        body: data,
+      }),
+    }),
+
+    deactivateUser: builder.mutation({
+      query: (id) => ({
+        url: `/users/${id}/deactivate`,
+        method: "PATCH",
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: "Users", id },
+        { type: "Users", id: "LIST" },
+      ],
+    }),
+
+    activateUser: builder.mutation({
+      query: (id) => ({
+        url: `/users/${id}/activate`,
+        method: "PATCH",
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: "Users", id },
+        { type: "Users", id: "LIST" },
+      ],
+    }),
+
     updateUser: builder.mutation({
       query: ({ id, ...patch }) => ({
         url: `/users/${id}`,
@@ -82,8 +109,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         { type: "Users", id: "LIST" },
       ],
     }),
+
   }),
-  overrideExisting: false,
 });
 
 export const {
@@ -94,6 +121,7 @@ export const {
   useVerifyAccountMutation,
   useResendCodeMutation,
   useForgotPasswordMutation,
-  
-
+  useDeactivateUserMutation,
+  useActivateUserMutation,
+  useChangePasswordMutation
 } = usersApiSlice;

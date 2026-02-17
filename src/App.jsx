@@ -21,8 +21,10 @@ import Prefetch from "./pages/Prefetch.jsx";
 import SessionPage from './pages/SessionPage'
 import VerifyPage from "./pages/VerifyPage.jsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
-
+import SettingsPage from "./pages/SettingsPage.jsx";
 import { setNavigate } from './utils/navigation.jsx';
+import SettingsLayout from "./pages/SettingsLayout.jsx";
+import ChangePassword from "./pages/ChangePassword.jsx";
 
 function App() {
   const navigate = useNavigate();
@@ -34,6 +36,9 @@ function App() {
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
+     
+
+     
       <Routes>
         <Route element={<Layout />}>
           {/* Public routes */}
@@ -54,9 +59,14 @@ function App() {
               
               {/* User routes */}
               <Route path="/products" element={<ProductsList />} />
-              <Route path="/sessions" element={<SessionPage/>}/>
+              
               <Route path="/cart" element={<CartPage />} />
               <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/settings" element={<SettingsLayout />}>
+             <Route index element={<SettingsPage />} />
+             <Route path="change-password" element={<ChangePassword />} />
+             <Route path="sessions" element={<SessionPage />} />
+            </Route>
 
               {/* Protected Admin Routes */}
               <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
@@ -78,6 +88,7 @@ function App() {
 
         </Route>
       </Routes>
+   
     </>
   );
 }

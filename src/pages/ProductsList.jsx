@@ -145,7 +145,7 @@ const ProductsList = () => {
                   className="mt-2 w-full border rounded-xl py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
                 >
                   {[...Array(10)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
+                    <option key={i + 1} value={i + 1}>C
                       {i + 1}
                     </option>
                   ))}

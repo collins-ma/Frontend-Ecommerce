@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiLogOut, FiHome, FiMoreVertical, FiSettings, FiUser, FiHelpCircle } from "react-icons/fi";
 import { useOnsendLogoutMutation } from "../auth/authApiSlice";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation,Link } from "react-router-dom";
 import CartIcon from "../pages/cartIcon";
 import toast, { Toaster } from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
@@ -18,7 +18,7 @@ export default function Header() {
   const extraDropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const [onsendLogout] = useOnsendLogoutMutation();
+  const [OnsendLogout] = useOnsendLogoutMutation();
 
   // Apply theme
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       navigate('/login')
-      await onsendLogout().unwrap();
+      await OnsendLogout().unwrap();
       toast.success("Logged out successfully!", {
         duration: 1000,
         style: { background: "#000", color: "#fff", fontWeight: "bold" },
@@ -90,7 +90,7 @@ export default function Header() {
   };
 
   const themeIcons = { system: "🖥️", light: "☀️", dark: "🌙" };
-  const publicPages = ["/login", "/signup", "/"];
+  const publicPages = ["/login", "/signup", "/", "/verify","forgot-password"];
   const isPublicPage = publicPages.includes(location.pathname);
 
   // Home icon logic
@@ -175,9 +175,12 @@ export default function Header() {
                     transform transition-all duration-200 ease-out
                     ${extraDropdownOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-1"}`}
                 >
-                  <button className="w-full flex items-center gap-2 px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
-                    <FiSettings /> Settings
-                  </button>
+                 <Link
+  to="/settings"
+  className="w-full flex items-center gap-2 px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 rounded"
+>
+  <FiSettings /> Settings
+</Link>
                   <button className="w-full flex items-center gap-2 px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
                     <FiUser /> Profile
                   </button>
