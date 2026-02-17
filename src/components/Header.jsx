@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import CartIcon from "../pages/cartIcon";
 import toast, { Toaster } from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 export default function Header() {
   const { isAdmin } = useAuth();
@@ -175,9 +176,12 @@ export default function Header() {
                     transform transition-all duration-200 ease-out
                     ${extraDropdownOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-1"}`}
                 >
-                  <button className="w-full flex items-center gap-2 px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
-                    <FiSettings /> Settings
-                  </button>
+                 <Link
+  to="/settings"
+  className="w-full flex items-center gap-2 px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+>
+  <FiSettings /> Settings
+</Link>
                   <button className="w-full flex items-center gap-2 px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
                     <FiUser /> Profile
                   </button>
