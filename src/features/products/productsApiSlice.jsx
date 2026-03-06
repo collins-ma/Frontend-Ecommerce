@@ -1,7 +1,5 @@
-import {apiSlice } from '../../app/apiSlice';
-
+import { apiSlice } from '../../app/apiSlice';
 import { createEntityAdapter } from '@reduxjs/toolkit';
-
 
 const productsAdapter = createEntityAdapter({
   selectId: (product) => product._id,
@@ -12,9 +10,9 @@ const initialState = productsAdapter.getInitialState();
 
 export const productsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    // ✅ Fetch products, optionally filtered by category
     getProducts: builder.query({
-      query: () => '/products',
-     
+      query: (category) => (category ? `/products?category=${category}` : '/products'),
       transformResponse: (responseData) => {
         return productsAdapter.setAll(initialState, responseData);
       },
@@ -26,7 +24,17 @@ export const productsApiSlice = apiSlice.injectEndpoints({
             ]
           : [{ type: 'Product', id: 'LIST' }],
     }),
+
+    // ✅ Create product
+    createProduct: builder.mutation({
+      query: (formData) => ({
+        url: '/products/upload',
+        method: 'POST',
+        body: formData,
+      }),
+      invalidatesTags: [{ type: 'Product', id: 'LIST' }],
+    }),
   }),
 });
 
-export const { useGetProductsQuery } = productsApiSlice;
+export const { useGetProductsQuery, useCreateProductMutation } = productsApiSlice;

@@ -47,8 +47,8 @@ const Footer = () => {
     <hr className="border-gray-700 my-4" />
 
     <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
-      <p>© 2025 My E-Commerce Store. All rights reserved.</p>
-      <p className="mt-2 md:mt-0">Designed with ❤️ using React + Tailwind CSS</p>
+      <p>© 2026 My E-Commerce Store. All rights reserved.</p>
+  
     </div>
 
   </div>

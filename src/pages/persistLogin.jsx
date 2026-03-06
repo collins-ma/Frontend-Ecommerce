@@ -20,15 +20,15 @@ const PersistLogin = () => {
     { isUninitialized, isLoading, isSuccess, isError, error },
   ] = useRefreshMutation();
 
-  // 🔁 Try refresh on mount
+  
   useEffect(() => {
-    if (effectRan.current || process.env.NODE_ENV !== "development") {
+    if (effectRan.current ===true || process.env.NODE_ENV !== "development") {
       const verifyRefreshToken = async () => {
         try {
           await refresh().unwrap();
           setTrueSuccess(true);
         } catch (err) {
-          console.error(err);
+          
         }
       };
 
@@ -42,7 +42,7 @@ const PersistLogin = () => {
     };
   }, [token, persist, refresh]);
 
-  // ❌ Refresh failed → redirect
+  
   useEffect(() => {
     if (isError) {
       const timer = setTimeout(() => {
@@ -53,15 +53,13 @@ const PersistLogin = () => {
     }
   }, [isError, navigate]);
 
-  // 🚫 Persist disabled
+
   if (!persist) {
     return token ? <Outlet /> : <Navigate to="/login" replace />;
   }
 
-  // ⏳ Loading refresh
   if (isLoading) return <PulseLoader />;
 
-  // ❌ Refresh error UI
   if (isError) {
     return (
       <p className="text-red-600 bg-red-100 border border-red-300 px-4 py-3 rounded-lg text-sm">
@@ -70,7 +68,7 @@ const PersistLogin = () => {
     );
   }
 
-  // ✅ Auth OK
+
   if ((isSuccess && trueSuccess) || (token && isUninitialized)) {
     return <Outlet />;
   }

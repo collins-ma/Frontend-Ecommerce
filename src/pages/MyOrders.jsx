@@ -3,8 +3,14 @@ import OrderCard from "./OrderCard";
 import PulseLoader from "react-spinners/PulseLoader";
 import useAuth from "../hooks/useAuth";
 import React from "react";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
+ 
 export default function MyOrders() {
+  useDocumentTitle('My orders')
+
+  
+
   const { userId } = useAuth();
 
   const {
@@ -19,7 +25,7 @@ export default function MyOrders() {
     refetchOnMountOrArgChange: true,
   });
 
-  // Loading
+  
   if (isLoading)
     return (
       <div className="flex justify-center mt-10">
@@ -27,7 +33,7 @@ export default function MyOrders() {
       </div>
     );
 
-  // Error
+  
   if (isError)
     return (
       <p className="text-red-600 dark:text-red-400 text-center mt-10">
@@ -36,10 +42,11 @@ export default function MyOrders() {
     );
 
   if (isSuccess) {
+    console.log('orders',ordersData)
     const { ids = [], entities = {} } = ordersData;
     const allOrders = ids.map((id) => entities[id]);
     const userOrders = allOrders.filter(
-      (order) => order.user?._id === userId
+      (order) => order.user === userId
     );
 
     if (!userOrders.length) {

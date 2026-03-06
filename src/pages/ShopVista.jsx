@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 function ShopVista() {
+  useDocumentTitle('shopvista')
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-100 via-orange-100 to-purple-200 flex flex-col">
       

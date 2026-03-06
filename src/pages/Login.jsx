@@ -1,87 +1,102 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useLoginMutation } from "../auth/authApiSlice";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../auth/authSlice";
-import { useNavigate } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import usePersist from "../hooks/usePersist";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 function Login() {
+  useDocumentTitle("Login");
+
   const [persist, setPersist] = usePersist();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
   const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const toastRef = useRef({ error: false, success: false });
+
+  
+  useEffect(() => {
+    if (errorMessage || successMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+        setSuccessMessage("");
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage, successMessage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setErrorMessage("");
+    setSuccessMessage("");
+
     if (!username.trim() || !password.trim()) {
-      if (!toastRef.current.error) {
-        toastRef.current.error = true;
-        toast.error("Please fill in all fields", {
-          id: "login-toast",
-          style: { background: "#000", color: "#fff" },
-          duration: 2000,
-          onClose: () => (toastRef.current.error = false),
-        });
-      }
+      setErrorMessage("Please fill in all fields");
       return;
     }
 
     try {
-      const userData= await login({ username, password }).unwrap();
-      console.log("Login successful", userData);
-      // --- Handle unverified accounts ---
+      const userData = await login({ username, password }).unwrap();
+
       if (userData.needsVerification) {
         navigate("/verify", { state: { email: userData.email } });
         return;
       }
 
-      // --- Verified: save credentials and navigate ---
       dispatch(setCredentials(userData.accessToken));
+
+      setSuccessMessage("Login successful!");
 
       const decoded = jwtDecode(userData.accessToken);
       const roles = decoded?.roles || [];
       const isAdmin = roles.includes("admin");
       const isUser = roles.includes("user");
 
-      const redirectPath = localStorage.getItem("redirectAfterLogin");
-      if (redirectPath) {
-        localStorage.removeItem("redirectAfterLogin");
-        return navigate(redirectPath, { replace: true });
-      }
+     
 
-      if (isAdmin) navigate("/admin/dashboard", { replace: true });
-      else if (isUser) navigate("/products", { replace: true });
-      else navigate("/", { replace: true });
+      setTimeout(() => {
+        if (isAdmin) navigate("/admin/dashboard", { replace: true });
+        else if (isUser) navigate("/products", { replace: true });
+        else navigate("/", { replace: true });
+      }, 1000);
     } catch (err) {
-      console.error("Login failed", err);
-      if (!toastRef.current.error) {
-        toastRef.current.error = true;
-        toast.error(err?.data?.message || "Invalid credentials", {
-          id: "login-toast",
-          style: { background: "#000", color: "#fff" },
-          duration: 2000,
-          onClose: () => (toastRef.current.error = false),
-        });
-      }
+      setErrorMessage(
+        err?.data?.message 
+      );
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <Toaster position="top-center" reverseOrder={false} />
-      <div className="bg-white shadow-xl rounded-2xl p-10 w-full max-w-md flex flex-col gap-4 text-black">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md flex flex-col gap-4 text-black">
         <h2 className="text-3xl font-bold text-center mb-6">
           Login to ShopVista
         </h2>
+
+        
+        {successMessage && (
+          <div className="bg-green-600 text-white px-4 py-3 rounded-xl text-sm text-center font-semibold shadow-md transition-all duration-300">
+            {successMessage}
+          </div>
+        )}
+
+        
+        {errorMessage && (
+          <div className="bg-red-500 text-white px-4 py-3 rounded-xl text-sm text-center font-semibold shadow-md transition-all duration-300">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
@@ -109,7 +124,6 @@ function Login() {
             </button>
           </div>
 
-          {/* Forgot Password Link */}
           <div className="text-right">
             <button
               type="button"
@@ -120,7 +134,6 @@ function Login() {
             </button>
           </div>
 
-          {/* KEEP ME LOGGED IN */}
           <label className="flex items-center gap-2 text-gray-700">
             <input
               type="checkbox"
@@ -134,20 +147,21 @@ function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="p-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition"
+            className="p-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition disabled:opacity-50"
           >
             {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
 
+        
         <div className="text-center mt-4 text-gray-600">
           Don't have an account?{" "}
-          <a
-            href="/signup"
+          <Link
+            to="/signup"
             className="text-orange-500 font-semibold hover:underline"
           >
             Sign Up
-          </a>
+          </Link>
         </div>
       </div>
     </div>

@@ -44,6 +44,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       ],
     }),
 
+    // Verify user account
     verifyAccount: builder.mutation({
       query: (body) => ({
         url: "/users/verify",
@@ -52,6 +53,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    // Resend verification code
     resendCode: builder.mutation({
       query: (body) => ({
         url: "/users/resend-code",
@@ -60,6 +62,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    // Forgot password
     forgotPassword: builder.mutation({
       query: (email) => ({
         url: "/auth/forgot-password",
@@ -68,6 +71,16 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    // Reset password
+    resetPassword: builder.mutation({
+      query: ({ token, password }) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        body: { token, password },
+      }),
+    }),
+
+    // Change password
     changePassword: builder.mutation({
       query: (data) => ({
         url: '/auth/change-password',
@@ -76,6 +89,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    // Deactivate user
     deactivateUser: builder.mutation({
       query: (id) => ({
         url: `/users/${id}/deactivate`,
@@ -87,6 +101,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       ],
     }),
 
+    // Activate user
     activateUser: builder.mutation({
       query: (id) => ({
         url: `/users/${id}/activate`,
@@ -98,6 +113,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       ],
     }),
 
+    // Update user (username and email)
     updateUser: builder.mutation({
       query: ({ id, ...patch }) => ({
         url: `/users/${id}`,
@@ -117,11 +133,12 @@ export const {
   useGetUsersQuery,
   useGetUserByIdQuery,
   useDeleteUserMutation,
-  useUpdateUserMutation,
+  useUpdateUserMutation,   // <-- added for updating username/email
   useVerifyAccountMutation,
   useResendCodeMutation,
   useForgotPasswordMutation,
+  useResetPasswordMutation,
   useDeactivateUserMutation,
   useActivateUserMutation,
-  useChangePasswordMutation
+  useChangePasswordMutation,
 } = usersApiSlice;

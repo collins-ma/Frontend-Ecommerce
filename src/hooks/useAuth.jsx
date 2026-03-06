@@ -7,10 +7,11 @@ const useAuth = () => {
   let isAdmin = false;
   let isUser = false;
   let username = "";
+  let email=""
   let status = "User";
   let userId = "";
   let roles = [];
-  let currentSessionId = ""; // <-- add this
+  let currentSessionId = ""; 
 
   const token = useSelector(selectCurrentToken);
 
@@ -22,8 +23,9 @@ const useAuth = () => {
       isAdmin = roles.includes("admin");
       isUser = roles.includes("user");
       username = decoded?.username || "";
+      email=decoded?.email||""
       userId = decoded?._id || "";
-      currentSessionId = decoded?.sessionId || ""; // <-- decode sessionId
+      currentSessionId = decoded?.sessionId || ""; 
 
       if (isAdmin) status = "Admin";
     } catch (err) {
@@ -33,6 +35,7 @@ const useAuth = () => {
         isAdmin: false,
         isUser: false,
         username: "",
+        email:"",
         status: "User",
         roles: [],
         userId: "",
@@ -46,9 +49,10 @@ const useAuth = () => {
     isUser,
     username,
     status,
+    email,
     roles,
     userId,
-    currentSessionId, // <-- return it
+    currentSessionId, 
   };
 };
 

@@ -10,7 +10,7 @@ const CartIcon = () => {
   const token=useSelector(selectCurrentToken)
   const { data: cart, isLoading } = useGetCartQuery(undefined, {
     refetchOnMountOrArgChange: true,
-    skip: !token, // skip until token is ready
+    skip: !token, 
   });
 
   const totalItems = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
@@ -18,7 +18,7 @@ const CartIcon = () => {
   return (
     <div
       className="relative cursor-pointer"
-      onClick={() => navigate("/cart")} // navigate to cart page
+      onClick={() => navigate("/cart")} 
       title="View Cart"
     >
       <FiShoppingCart className="text-2xl text-gray-800 dark:text-white" />

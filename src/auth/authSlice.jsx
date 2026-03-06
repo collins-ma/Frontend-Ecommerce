@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   token: null,
-  needsVerification: null, // NEW: store unverified flag & email
+  needsVerification: null,
 };
 
 const authSlice = createSlice({
@@ -10,18 +10,18 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
-      // If login response has needsVerification
+      
       if (action.payload.needsVerification) {
         state.needsVerification = { email: action.payload.email };
-        state.token = null; // no token yet
+        state.token = null; 
       } else {
         state.token = action.payload.accessToken;
-        state.needsVerification = null; // clear if previously unverified
+        state.needsVerification = null
       }
     },
     logOut: (state) => {
       state.token = null;
-      state.needsVerification = null; // also clear unverified info
+      state.needsVerification = null; 
     },
   },
 });

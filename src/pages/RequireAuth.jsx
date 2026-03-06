@@ -6,7 +6,7 @@ import { selectCurrentToken } from "../auth/authSlice";
 
 const RequireAuth = ({ allowedRoles }) => {
     const location = useLocation();
-    const token = useSelector(selectCurrentToken); // check if token exists
+    const token = useSelector(selectCurrentToken)
     const { roles } = useAuth();
 
     const content = (

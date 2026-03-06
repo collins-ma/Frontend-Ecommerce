@@ -49,6 +49,12 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       providesTags: (result, error, id) => [{ type: 'Order', id }],
     }),
 
+    // Fetch **order status only** (for polling)
+    getOrderStatus: builder.query({
+      query: (id) => `/orders/${id}/status`,
+      providesTags: (result, error, id) => [{ type: 'Order', id }],
+    }),
+
     // Mutation to update order status
     updateOrderStatus: builder.mutation({
       query: ({ id, status }) => ({
@@ -62,8 +68,9 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetOrdersQuery,      // admin: all orders
-  useGetMyOrdersQuery,    // regular user: only their orders
+  useGetOrdersQuery,
+  useGetMyOrdersQuery,
   useGetOrderByIdQuery,
+  useGetOrderStatusQuery,
   useUpdateOrderStatusMutation,
 } = ordersApiSlice;

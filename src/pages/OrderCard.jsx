@@ -1,6 +1,7 @@
 import React from "react";
 
 export default function OrderCard({ order }) {
+ 
   if (!order) return null;
 
   const { _id, status, paymentMethod, total, items = [], createdAt } = order;
@@ -33,7 +34,7 @@ export default function OrderCard({ order }) {
         </span>
       </div>
 
-      {/* Payment */}
+      
       <div className="mb-2">
         <p className="text-gray-600 dark:text-gray-400 text-sm">
           Payment Method:
@@ -41,7 +42,7 @@ export default function OrderCard({ order }) {
         <p className="text-gray-800 dark:text-gray-100">{paymentMethod}</p>
       </div>
 
-      {/* Total */}
+      
       <div className="mb-2">
         <p className="text-gray-600 dark:text-gray-400 text-sm">Total:</p>
         <p className="text-gray-800 dark:text-gray-100 font-semibold">
@@ -49,7 +50,7 @@ export default function OrderCard({ order }) {
         </p>
       </div>
 
-      {/* Items */}
+      
       <div className="mb-2">
         <p className="text-gray-600 dark:text-gray-400 text-sm">Items:</p>
         <ul className="mt-1 space-y-1">
@@ -65,7 +66,7 @@ export default function OrderCard({ order }) {
         </ul>
       </div>
 
-      {/* Date */}
+      
       <p className="text-gray-500 dark:text-gray-400 text-xs mt-auto">
         Ordered on:{" "}
         {createdAt ? new Date(createdAt).toLocaleDateString() : "N/A"}

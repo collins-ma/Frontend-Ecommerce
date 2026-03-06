@@ -5,10 +5,12 @@ import {
   useVerifyAccountMutation,
   useResendCodeMutation,
 } from "../features/users/usersApiSlice";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 const COOLDOWN_SECONDS = 60;
 
 const VerifyPage = () => {
+  useDocumentTitle('verify')
   const location = useLocation();
   const navigate = useNavigate();
   const userEmail = location.state?.email;

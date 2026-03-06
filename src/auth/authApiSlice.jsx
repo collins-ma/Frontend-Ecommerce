@@ -1,9 +1,10 @@
 import { apiSlice } from "../app/apiSlice";
-import { logOut ,setCredentials} from "./authSlice"; // your auth reducer logout action
-
+import { logOut, setCredentials } from "./authSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+
+    
     login: builder.mutation({
       query: ({ username, password }) => ({
         url: "/auth/login",
@@ -11,22 +12,22 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: { username, password },
       }),
     }),
+
+  
     refresh: builder.mutation({
       query: () => ({
-          url: '/auth/refresh',
-          method: 'GET',
+        url: "/auth/refresh",
+        method: "GET",
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-          try {
-           const {data}  =  await queryFulfilled
-           const {accessToken}=data
-             
-              dispatch(setCredentials({ accessToken }))
-          } catch (err) {
-              console.log(err)
-          }
-      }
-  }),
+        const { data } = await queryFulfilled;
+        const { accessToken } = data;
+
+        dispatch(setCredentials({ accessToken }));
+      },
+    }),
+
+    
     register: builder.mutation({
       query: ({ username, email, phoneNumber, password }) => ({
         url: "/users",
@@ -36,38 +37,27 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
 
     
-   
-
-    OnsendLogout: builder.mutation({
+    onSendLogout: builder.mutation({
       query: () => ({
         url: "/sessions/logout-current",
-        method: "POST", // or GET depending on backend
+        method: "POST",
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-       const {data} =  await queryFulfilled; 
+        await queryFulfilled;
 
-       console.log(data)
-       
         
         dispatch(logOut());
-          
-      
-          dispatch(apiSlice.util.resetApiState())
-      
-        
-        } catch (err) {
-          console.error("Logout failed:", err);
-        }
+
+        dispatch(apiSlice.util.resetApiState());
       },
     }),
+
   }),
 });
 
 export const {
   useLoginMutation,
   useRegisterMutation,
-  useOnsendLogoutMutation,
-  useRefreshMutation
-  
+  useOnSendLogoutMutation,
+  useRefreshMutation,
 } = authApiSlice;

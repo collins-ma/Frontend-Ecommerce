@@ -4,30 +4,37 @@ import { useGetOrdersQuery } from "../features/orders/ordersApiSlice";
 import PulseLoader from "react-spinners/PulseLoader";
 
 export default function OrdersList() {
-  const { data: ordersData, isLoading, isError, error, isSuccess }
-  =
-  useGetOrdersQuery('ordersList', {
-        pollingInterval: 60000,
-        refetchOnFocus: true,
-        refetchOnMountOrArgChange: true});
+  const {
+    data: ordersData,
+    isLoading,
+    isError,
+    error,
+    isSuccess,
+  } = useGetOrdersQuery(undefined, {
+    pollingInterval: 60000,
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: true,
+  });
 
-  // Loading state
+  
   if (isLoading)
     return (
-      <div className="flex justify-center mt-10">
-        <PulseLoader />
+      <div className="flex justify-center items-center min-h-screen">
+        <PulseLoader color="#4F46E5" />
       </div>
     );
 
-  // Error state
+  
   if (isError)
     return (
-      <p className="text-red-600 text-center mt-10">
-        {error?.data?.message || "Failed to load orders."}
-      </p>
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-red-600 text-center text-lg">
+          {error?.data?.message || "Failed to load orders."}
+        </p>
+      </div>
     );
 
-  // Process orders
+  
   let orders = [];
   if (isSuccess) {
     const { ids = [], entities = {} } = ordersData;
@@ -35,11 +42,16 @@ export default function OrdersList() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+    <div className="min-h-screen p-4 sm:p-6 md:p-10 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
         Orders Dashboard
       </h1>
-      <OrdersTable orders={orders} />
+
+      
+      <div className="overflow-x-auto">
+        <OrdersTable orders={orders} />
+      </div>
     </div>
   );
 }

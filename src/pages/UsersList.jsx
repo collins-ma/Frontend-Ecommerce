@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { useGetUsersQuery } from "../features/users/usersApiSlice";
 import { Link } from "react-router-dom";
-
+import useDocumentTitle from "../hooks/useDocumentTitle";
 export default function UsersList() {
+  useDocumentTitle('users')
   const { data: usersData, isLoading, isError, error } = useGetUsersQuery(
     "usersList",
     {

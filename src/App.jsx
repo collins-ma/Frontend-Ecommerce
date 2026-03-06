@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import CreateProduct from "./pages/CreateProduct.jsx";
 
 import ShopVista from './pages/ShopVista';
 import ProductsList from './pages/ProductsList';
@@ -15,16 +16,19 @@ import OrderDetail from './pages/OrderDetail.jsx';
 import CartPage from './pages/CartPage.jsx';
 import MyOrders from './pages/MyOrders.jsx';
 import RequireAuth from './pages/RequireAuth.jsx';
+import CheckoutPage from "./pages/CheckoutPage.jsx";
 import { ROLES } from './config/roles.jsx';
 import PersistLogin from "./pages/persistLogin.jsx";
 import Prefetch from "./pages/Prefetch.jsx";
 import SessionPage from './pages/SessionPage'
+import UpdateUserProfile from './pages/UpdateUserProfile.jsx'
 import VerifyPage from "./pages/VerifyPage.jsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
 import SettingsPage from "./pages/SettingsPage.jsx";
 import { setNavigate } from './utils/navigation.jsx';
 import SettingsLayout from "./pages/SettingsLayout.jsx";
 import ChangePassword from "./pages/ChangePassword.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 
 function App() {
   const navigate = useNavigate();
@@ -46,6 +50,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/verify" element={<VerifyPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path ="/reset-password" element={<ResetPasswordPage/>}/>
           <Route path="/login" element={<Login />} />
 
           {/* Routes that require login + prefetch */}
@@ -62,7 +67,11 @@ function App() {
               
               <Route path="/cart" element={<CartPage />} />
               <Route path="/my-orders" element={<MyOrders />} />
+               <Route path="/checkout" element={<CheckoutPage/>}/>
+               
+               <Route path="/change-profile" element={<UpdateUserProfile/>}/>
               <Route path="/settings" element={<SettingsLayout />}>
+             
              <Route index element={<SettingsPage />} />
              <Route path="change-password" element={<ChangePassword />} />
              <Route path="sessions" element={<SessionPage />} />
@@ -73,6 +82,7 @@ function App() {
                 <Route path="/admin/dashboard" element={<AdminDashBoard />} />
                 <Route path="/users" element={<UsersList />} />
                 <Route path="/users/:userId" element={<UserDetail />} />
+                <Route path="/create-product" element={<CreateProduct/>}/>
               </Route>
 
               {/* Protected Orders Routes */}
