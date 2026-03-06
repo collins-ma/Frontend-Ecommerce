@@ -9,7 +9,7 @@ import {
 } from "react-icons/fi";
 import { useOnSendLogoutMutation } from "../auth/authApiSlice";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import CartIcon from "../pages/cartIcon";
+import CartIcon from "../pages/CartIcon";
 import useAuth from "../hooks/useAuth";
 
 export default function Header() {
