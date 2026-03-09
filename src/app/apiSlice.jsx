@@ -36,20 +36,13 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
     api.dispatch(logOut());
 
-    setTimeout(() => {
+    
       const navigate = getNavigate(); 
 
       if (navigate) navigate("/login");
-    }, 2000);
-  
-    return {
-      error: {
-        data: { message: "your login has expired. Please log in again." },
     
-      },
-      
-    };
   }
+    
 
   return result;
 };
