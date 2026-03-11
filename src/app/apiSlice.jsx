@@ -4,7 +4,7 @@ import { getNavigate } from "../utils/navigation";
 
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.REACT_APP_API_URL, 
+  baseUrl: "https://shopvista-q42b.onrender.com",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const token = getState().auth.token;
