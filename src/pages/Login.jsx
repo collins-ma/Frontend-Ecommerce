@@ -71,6 +71,7 @@ function Login() {
         else navigate("/", { replace: true });
       }, 1000);
     } catch (err) {
+      console.log(err)
       setErrorMessage(
         err?.data?.message 
       );
