@@ -3,7 +3,7 @@ import { logOut, setCredentials } from "../auth/authSlice";
 import { getNavigate } from "../utils/navigation";
 
 
-const baseQuery = fetchBaseQuery({
+const baseQuery = fetchBaseQuery({ 
   baseUrl: import.meta.env.VITE_API_URL ,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
@@ -12,7 +12,7 @@ const baseQuery = fetchBaseQuery({
     return headers;
   },
 });
-console.log("API URL VITE:", import.meta.env.VITE_API_URL);
+
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
 
