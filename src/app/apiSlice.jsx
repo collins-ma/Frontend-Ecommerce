@@ -12,7 +12,7 @@ const baseQuery = fetchBaseQuery({
     return headers;
   },
 });
-console.log("API URL:", import.meta.env.VITE_API_URL);
+console.log("API URL VITE:", import.meta.env.VITE_API_URL);
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
 
