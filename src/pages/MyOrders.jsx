@@ -43,7 +43,7 @@ export default function MyOrders() {
 
   if (isSuccess) {
     
-    const { ids = [], entities = {} } = ordersData;
+    const { ids =[], entities = {} } = ordersData;
     const allOrders = ids.map((id) => entities[id]);
     const userOrders = allOrders.filter(
       (order) => order.user === userId
