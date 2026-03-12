@@ -8,7 +8,7 @@ const useAuth = () => {
   let isUser = false;
   let username = "";
   let email=""
-  let status = "User";
+  let status = "User"
   let userId = "";
   let roles = [];
   let currentSessionId = ""; 
