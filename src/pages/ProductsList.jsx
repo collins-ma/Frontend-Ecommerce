@@ -6,7 +6,6 @@ import { useAddToCartMutation } from "../features/cart/cartApiSlice";
 import useAuth from "../hooks/useAuth";
 import { FiMenu, FiX } from "react-icons/fi";
 import useDocumentTitle from "../hooks/useDocumentTitle";
-import Loader from "../spinners/Loader";
 
 const ProductsList = () => {
   useDocumentTitle("products");
@@ -98,7 +97,8 @@ const ProductsList = () => {
     setIsMenuOpen(false);
   };
 
-  if (isLoading) return <Loader />;
+  if (isLoading)
+    return <p className="text-center mt-10">Loading products...</p>;
 
   if (isError)
     return (

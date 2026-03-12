@@ -4,7 +4,7 @@ import { selectCurrentToken } from "../auth/authSlice";
 import {jwtDecode} from "jwt-decode"
 
 const useAuth = () => {
-  let isAdmin = false
+  let isAdmin = false;
   let isUser = false;
   let username = "";
   let email=""
