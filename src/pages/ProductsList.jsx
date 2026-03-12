@@ -98,8 +98,7 @@ const ProductsList = () => {
     setIsMenuOpen(false);
   };
 
-  if (isLoading)
-    return <Loader/>;
+  if (isLoading) return <Loader />;
 
   if (isError)
     return (
