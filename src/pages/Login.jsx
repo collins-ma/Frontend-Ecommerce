@@ -67,7 +67,7 @@ function Login() {
 
       setTimeout(() => {
         if (isAdmin) navigate("/admin/dashboard", { replace: true });
-        else if (isUser) navigate("/products", { replace: true });
+        else if (isUser ) navigate("/products", { replace: true });
         else navigate("/", { replace: true });
       }, 1000);
     } catch (err) {
@@ -137,11 +137,12 @@ function Login() {
           <label className="flex items-center gap-2 text-gray-700">
             <input
               type="checkbox"
-              checked={persist}
+              checked
+              readOnly
               onChange={() => setPersist((prev) => !prev)}
               className="w-4 h-4"
             />
-            Keep me logged in
+            remember me
           </label>
 
           <button

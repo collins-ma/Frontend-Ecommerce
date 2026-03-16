@@ -6,6 +6,7 @@ import { useAddToCartMutation } from "../features/cart/cartApiSlice";
 import useAuth from "../hooks/useAuth";
 import { FiMenu, FiX } from "react-icons/fi";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import { LoaderCircle } from "lucide-react";
 
 const ProductsList = () => {
   useDocumentTitle("products");
@@ -97,8 +98,15 @@ const ProductsList = () => {
     setIsMenuOpen(false);
   };
 
-  if (isLoading)
-    return <p className="text-center mt-10">Loading products...</p>;
+
+  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+
+  {isLoading && (
+    <div className="w-full flex justify-center py-4">
+      <LoaderCircle className="animate-spin w-8 h-8 text-green-600" />
+    </div>
+  )}
+  </div>
 
   if (isError)
     return (
