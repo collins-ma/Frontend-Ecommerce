@@ -1,63 +1,82 @@
-import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { selectCurrentToken } from "../auth/authSlice";
-import { useRefreshMutation } from "../auth/authApiSlice";
-import { Navigate, Outlet } from "react-router-dom";
-import usePersist from "../hooks/usePersist";
-import PulseLoader from "react-spinners/PulseLoader";
-import React from 'react';
-
+import { Outlet, Link } from "react-router-dom"
+import { useEffect, useRef, useState } from 'react'
+import { useRefreshMutation } from "../auth/authApiSlice"
+import usePersist from "../hooks/usePersist"
+import { useSelector } from 'react-redux'
+import { selectCurrentToken } from "../auth/authSlice"
+import PulseLoader from 'react-spinners/PulseLoader'
+import React from 'react'
+import { Navigate } from "react-router-dom"
 const PersistLogin = () => {
-  const [persist] = usePersist();
-  const token = useSelector(selectCurrentToken);
 
-  const effectRan = useRef(false);
-  const [trueSuccess, setTrueSuccess] = useState(false);
+    const [persist] = usePersist()
+    const token = useSelector(selectCurrentToken)
+    
+    const effectRan = useRef(false)
 
-  const [refresh, { isUninitialized, isLoading, isSuccess, isError, error }] =
-    useRefreshMutation();
+    const [trueSuccess, setTrueSuccess] = useState(false)
 
-  // Only attempt refresh if persist is true and no token
-  useEffect(() => {
-    if (effectRan.current === true || process.env.NODE_ENV !== "development") {
-      const verifyRefreshToken = async () => {
-        try {
-          const result = await refresh(); // do not unwrap
-          if (result.data) setTrueSuccess(true);
-        } catch (err) {
-          console.error("Refresh error:", err);
+    const [refresh, {
+        isUninitialized,
+        isLoading,
+        isSuccess,
+        isError,
+        error
+    }] = useRefreshMutation()
+
+
+    useEffect(() => {
+
+        if (effectRan.current === true || process.env.NODE_ENV !== 'development') { // React 18 Strict Mode
+
+            const verifyRefreshToken = async () => {
+                console.log('verifying refresh token')
+                try {
+                    //const response = 
+                    await refresh()
+                    //const { accessToken } = response.data
+                    setTrueSuccess(true)
+                }
+                catch (err) {
+                    console.error(err)
+                }
+            }
+
+            if (!token && persist) verifyRefreshToken()
         }
-      };
 
-      if (!token && persist) verifyRefreshToken();
+        return () => effectRan.current = true
+
+        // eslint-disable-next-line
+    }, [])
+
+
+    let content
+   
+    if (!persist) {
+    content=<Outlet/>
+}
+
+     else if (isLoading) { //persist: yes, token: no
+        console.log('loading')
+        content = <PulseLoader color={"#FFF"} />
+    } else if (isError) { //persist: yes, token: no
+        console.log('error')
+        content = (
+            <p className='errmsg'>
+                {`${error?.data?.message} - `}
+                <Link to="/login">Please login again</Link>.
+            </p>
+        )
+    } else if (isSuccess && trueSuccess) { //persist: yes, token: yes
+        console.log('success')
+        content = <Outlet />
+    } else if (token && isUninitialized) { //persist: yes, token: yes
+        console.log('token and uninit')
+        console.log(isUninitialized)
+        content = <Outlet />
     }
 
-    return () => {
-      effectRan.current = true;
-    };
-  }, [token, persist, refresh]);
-
- 
-
-  // 2️⃣ Case: persist true + loading refresh
-  if (isLoading) return <PulseLoader />;
-
-  // 3️⃣ Case: persist true + refresh failed
-  if (isError) {
-    return (
-      <p className="text-red-600 bg-red-100 border border-red-300 px-4 py-3 rounded-lg text-sm">
-        {error?.data?.message || "Session expired"} — Please login again.
-      </p>
-    );
-  }
-
-  // 4️⃣ Case: token exists OR refresh succeeded
-  if ((isSuccess && trueSuccess) || (token && isUninitialized)) {
-    return <Outlet />;
-  }
-
-  // fallback spinner
-  return <PulseLoader />;
-};
-
-export default PersistLogin;
+    return content
+}
+export default PersistLogin

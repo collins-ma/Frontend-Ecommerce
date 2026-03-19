@@ -1,23 +1,25 @@
-import { useLocation, Navigate, Outlet } from "react-router-dom";
-import React from "react";
-import useAuth from "../hooks/useAuth";
-import { useSelector } from "react-redux";
-import { selectCurrentToken } from "../auth/authSlice";
+import { useLocation, Navigate, Outlet } from "react-router-dom"
+import useAuth from '../hooks/useAuth'
+import React from 'react'
+import { useSelector } from "react-redux"
+import { selectCurrentToken } from "../auth/authSlice"
 
 const RequireAuth = ({ allowedRoles }) => {
-    const location = useLocation();
+    const location = useLocation()
+    const { roles } = useAuth()
     const token = useSelector(selectCurrentToken)
-    const { roles } = useAuth();
 
-    const content = (
-        !token
-            ? <Navigate to="/login"  replace />
-            : roles.some(role => allowedRoles.includes(role))
-                ? <Outlet />
-                : <Navigate to="/login" replace />
-    );
+    // 🧠 Wait for auth to be ready
+    if (!token) {
+        return <Navigate to="/login" state={{ from: location }} replace />
+    }
 
-    return content;
+    
+
+    return (
+        roles.some(role => allowedRoles.includes(role))
+            ? <Outlet />
+            : <Navigate to="/login" state={{ from: location }} replace />
+    )
 }
-
-export default RequireAuth;
+export default RequireAuth
