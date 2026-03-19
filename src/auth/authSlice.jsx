@@ -5,6 +5,8 @@ const initialState = {
   needsVerification: null,
 };
 
+
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,

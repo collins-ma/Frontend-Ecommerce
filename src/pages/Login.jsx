@@ -15,7 +15,6 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -23,21 +22,19 @@ function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  
+  // Auto-clear messages
   useEffect(() => {
     if (errorMessage || successMessage) {
       const timer = setTimeout(() => {
         setErrorMessage("");
         setSuccessMessage("");
       }, 3000);
-
       return () => clearTimeout(timer);
     }
   }, [errorMessage, successMessage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setErrorMessage("");
     setSuccessMessage("");
 
@@ -48,52 +45,60 @@ function Login() {
 
     try {
       const userData = await login({ username, password }).unwrap();
+     
 
-      if (userData.needsVerification) {
+      if (userData?.needsVerification) {
         navigate("/verify", { state: { email: userData.email } });
         return;
       }
 
-      dispatch(setCredentials(userData.accessToken));
-
+      // Save access token in Redux
+      dispatch(setCredentials(userData));
       setSuccessMessage("Login successful!");
 
       const decoded = jwtDecode(userData.accessToken);
       const roles = decoded?.roles || [];
+
       const isAdmin = roles.includes("admin");
       const isUser = roles.includes("user");
 
-     
+      // 🔹 Redirect to last page if exists, else fallback
+      const lastPage = localStorage.getItem("lastPage");
 
       setTimeout(() => {
-        if (isAdmin) navigate("/admin/dashboard", { replace: true });
-        else if (isUser ) navigate("/products", { replace: true });
-        else navigate("/", { replace: true });
+        if (lastPage && lastPage !== "/login") {
+          navigate(lastPage, { replace: true });
+        } else {
+          // fallback based on role
+          if (isAdmin) navigate("/admin/dashboard", { replace: true });
+          else if (isUser) navigate("/products", { replace: true });
+          else navigate("/", { replace: true });
+        }
+
+        // Clear lastPage after redirect
+        localStorage.removeItem("lastPage");
       }, 1000);
     } catch (err) {
-      setErrorMessage(
-        err?.data?.message 
-      );
+      setErrorMessage(err?.data?.message || "Login failed");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
       <div className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md flex flex-col gap-4 text-black">
+        
         <h2 className="text-3xl font-bold text-center mb-6">
           Login to ShopVista
         </h2>
 
-        
         {successMessage && (
-          <div className="bg-green-600 text-white px-4 py-3 rounded-xl text-sm text-center font-semibold shadow-md transition-all duration-300">
+          <div className="bg-green-600 text-white px-4 py-3 rounded-xl text-sm text-center font-semibold shadow-md">
             {successMessage}
           </div>
         )}
 
-        
         {errorMessage && (
-          <div className="bg-red-500 text-white px-4 py-3 rounded-xl text-sm text-center font-semibold shadow-md transition-all duration-300">
+          <div className="bg-red-500 text-white px-4 py-3 rounded-xl text-sm text-center font-semibold shadow-md">
             {errorMessage}
           </div>
         )}
@@ -103,6 +108,7 @@ function Login() {
             type="text"
             value={username}
             placeholder="Username"
+            autoComplete="username"
             onChange={(e) => setUsername(e.target.value)}
             className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
@@ -112,12 +118,13 @@ function Login() {
               type={showPassword ? "text" : "password"}
               value={password}
               placeholder="Password"
+              autoComplete="current-password"
               onChange={(e) => setPassword(e.target.value)}
               className="w-full pr-10 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={() => setShowPassword((prev) => !prev)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-black"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -134,15 +141,15 @@ function Login() {
             </button>
           </div>
 
+          {/* Remember me */}
           <label className="flex items-center gap-2 text-gray-700">
             <input
               type="checkbox"
-              checked
-              readOnly
+              checked={persist}
               onChange={() => setPersist((prev) => !prev)}
               className="w-4 h-4"
             />
-            remember me
+            Remember me
           </label>
 
           <button
@@ -154,7 +161,6 @@ function Login() {
           </button>
         </form>
 
-        
         <div className="text-center mt-4 text-gray-600">
           Don't have an account?{" "}
           <Link
