@@ -26,8 +26,10 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
     // Attempt refresh token
     const refreshResult = await baseQuery("auth/refresh", api, extraOptions);
+    
 
     if (refreshResult?.data) {
+      
       // Update Redux store with new access token
       api.dispatch(setCredentials(refreshResult.data));
 
@@ -38,7 +40,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     // Refresh failed → log out
     api.dispatch(logOut());
 
-    // Redirect to login
+    // // Redirect to login
     const navigate = getNavigate();
     if (navigate) navigate("/login");
   }
