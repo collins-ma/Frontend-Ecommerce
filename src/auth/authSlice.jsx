@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   token: null,
   needsVerification: null,
+  authError:null
 };
 
 
@@ -25,11 +26,20 @@ const authSlice = createSlice({
       state.token = null;
       state.needsVerification = null; 
     },
+
+    setAuthError:(state,action)=>{
+      state.authError=action.payload
+
+    },
+    clearAuthError:(state)=>{
+      state.authError=null
+    }
   },
 });
 
 export const selectCurrentToken = (state) => state.auth.token;
+export const selectAuthError=(state)=>state.auth.authError
 export const selectNeedsVerification = (state) => state.auth.needsVerification;
 
-export const { setCredentials, logOut } = authSlice.actions;
+export const { setCredentials, logOut,setAuthError,clearAuthError } = authSlice.actions;
 export default authSlice.reducer;

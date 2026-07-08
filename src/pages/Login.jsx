@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useLoginMutation } from "../auth/authApiSlice";
-import { useDispatch } from "react-redux";
-import { setCredentials } from "../auth/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setCredentials,
+  clearAuthError,
+  selectAuthError
+} from "../auth/authSlice";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
@@ -16,28 +20,35 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+
 
   const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Auto-clear messages
+  // Read auth error from Redux
+  const authError = useSelector(selectAuthError);
+
+  // Show auth error (e.g. session expired / logged out from another device)
   useEffect(() => {
-    if (errorMessage || successMessage) {
+    if (authError) {
+      setErrorMessage(authError);
+
       const timer = setTimeout(() => {
+        dispatch(clearAuthError());
         setErrorMessage("");
-        setSuccessMessage("");
-      }, 3000);
+      }, 5000);
+
       return () => clearTimeout(timer);
     }
-  }, [errorMessage, successMessage]);
+  }, [authError, dispatch]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
 
+    setErrorMessage("");
+  
     if (!username.trim() || !password.trim()) {
       setErrorMessage("Please fill in all fields");
       return;
@@ -45,16 +56,19 @@ function Login() {
 
     try {
       const userData = await login({ username, password }).unwrap();
-     
 
       if (userData?.needsVerification) {
-        navigate("/verify", { state: { email: userData.email } });
+        navigate("/verify", {
+          state: { email: userData.email },
+        });
         return;
       }
 
-      // Save access token in Redux
+      // Successful login
+      dispatch(clearAuthError());
       dispatch(setCredentials(userData));
-      setSuccessMessage("Login successful!");
+
+      // setSuccessMessage("Login successful!");
 
       const decoded = jwtDecode(userData.accessToken);
       const roles = decoded?.roles || [];
@@ -62,20 +76,21 @@ function Login() {
       const isAdmin = roles.includes("admin");
       const isUser = roles.includes("user");
 
-      // 🔹 Redirect to last page if exists, else fallback
       const lastPage = localStorage.getItem("lastPage");
 
       setTimeout(() => {
         if (lastPage && lastPage !== "/login") {
           navigate(lastPage, { replace: true });
         } else {
-          // fallback based on role
-          if (isAdmin) navigate("/admin/dashboard", { replace: true });
-          else if (isUser) navigate("/products", { replace: true });
-          else navigate("/", { replace: true });
+          if (isAdmin) {
+            navigate("/admin/dashboard", { replace: true });
+          } else if (isUser) {
+            navigate("/products", { replace: true });
+          } else {
+            navigate("/", { replace: true });
+          }
         }
 
-        // Clear lastPage after redirect
         localStorage.removeItem("lastPage");
       }, 1000);
     } catch (err) {
@@ -86,22 +101,15 @@ function Login() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
       <div className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md flex flex-col gap-4 text-black">
-        
         <h2 className="text-3xl font-bold text-center mb-6">
           Login to ShopVista
         </h2>
 
-        {successMessage && (
-          <div className="bg-green-600 text-white px-4 py-3 rounded-xl text-sm text-center font-semibold shadow-md">
-            {successMessage}
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="bg-red-500 text-white px-4 py-3 rounded-xl text-sm text-center font-semibold shadow-md">
-            {errorMessage}
-          </div>
-        )}
+       {errorMessage && (
+       <p className="text-red-600 text-center font-semibold">
+      {errorMessage}
+       </p>
+)}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
@@ -122,6 +130,7 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full pr-10 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
+
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
@@ -141,7 +150,6 @@ function Login() {
             </button>
           </div>
 
-          {/* Remember me */}
           <label className="flex items-center gap-2 text-gray-700">
             <input
               type="checkbox"
