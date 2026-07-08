@@ -4,9 +4,10 @@ import { useGetProductsQuery } from "../features/products/productsApiSlice";
 import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
 import { useAddToCartMutation } from "../features/cart/cartApiSlice";
 import useAuth from "../hooks/useAuth";
-import { FiMenu, FiX } from "react-icons/fi";
+
 import useDocumentTitle from "../hooks/useDocumentTitle";
-import { LoaderCircle } from "lucide-react";
+import { Search,X ,LoaderCircle} from "lucide-react";
+import ProductSkeleton from "../app/skeletons/ProductsSkeleton";
 
 const ProductsList = () => {
   useDocumentTitle("products");
@@ -29,11 +30,10 @@ const ProductsList = () => {
   const [quantities, setQuantities] = useState({});
   const [addingItemId, setAddingItemId] = useState(null);
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef(null);
 
   
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
   const [messageType, setMessageType] = useState("");
 
   
@@ -47,18 +47,7 @@ const ProductsList = () => {
     }
   }, [message]);
 
-  
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+ 
   const handleQuantityChange = (productId, value) => {
     setQuantities((prev) => ({ ...prev, [productId]: Number(value) }));
   };
@@ -95,18 +84,21 @@ const ProductsList = () => {
       setSearchParams({});
     }
     refetch();
-    setIsMenuOpen(false);
+   
   };
 
 
-  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-
-  {isLoading && (
-    <div className="w-full flex justify-center py-4">
-      <LoaderCircle className="animate-spin w-8 h-8 text-green-600" />
+  if (isLoading) {
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <ProductSkeleton key={index} />
+        ))}
+      </div>
     </div>
-  )}
-  </div>
+  );
+}
 
   if (isError)
     return (
@@ -115,8 +107,18 @@ const ProductsList = () => {
       </p>
     );
 
-  const allProducts =
-    products?.ids.map((id) => products.entities[id]) || [];
+const allProducts =
+  products?.ids.map((id) => products.entities[id]) || [];
+
+const filteredProducts = allProducts.filter((product) => {
+  const keyword = search.toLowerCase().trim();
+
+  return (
+    product.name?.toLowerCase().includes(keyword) ||
+    product.description?.toLowerCase().includes(keyword) ||
+    product.category?.name?.toLowerCase().includes(keyword)
+  );
+});
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -138,57 +140,38 @@ const ProductsList = () => {
 
       
       <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 shadow-md px-4 py-3 flex items-center gap-4">
-        <div ref={menuRef} className="relative">
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-          >
-            {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-          </button>
 
-          {isMenuOpen && (
-            <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-4 z-50">
-              <div className="mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
-                <Link
-                  to="/my-orders"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block w-full text-left py-1 px-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition"
-                >
-                  View Orders
-                </Link>
-              </div>
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 py-2">
 
-              <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
-                Categories
-              </h3>
+  <button
+    onClick={() => handleCategoryClick("")}
+    className={`px-5 py-2 rounded-full transition text-left sm:text-center ${
+      selectedCategory === ""
+        ? "bg-black text-white"
+        : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
+    }`}
+  >
+    All
+  </button>
 
-              <ul className="flex flex-col gap-2">
-                <li>
-                  <button
-                    onClick={() => handleCategoryClick("")}
-                    className="w-full text-left py-1 px-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition"
-                  >
-                    All Products
-                  </button>
-                </li>
+  {categories?.ids.map((id) => {
+    const cat = categories.entities[id];
 
-                {categories?.ids.map((id) => {
-                  const cat = categories.entities[id];
-                  return (
-                    <li key={cat._id}>
-                      <button
-                        onClick={() => handleCategoryClick(cat.name)}
-                        className="w-full text-left py-1 px-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition"
-                      >
-                        {cat.name}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
-        </div>
+    return (
+      <button
+        key={cat._id}
+        onClick={() => handleCategoryClick(cat.name)}
+        className={`px-5 py-2 rounded-full transition text-left sm:text-center ${
+          selectedCategory === cat.name
+            ? "bg-black text-white"
+            : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
+        }`}
+      >
+        {cat.name}
+      </button>
+    );
+  })}
+</div>
       </div>
 
       {/* Welcome */}
@@ -202,59 +185,127 @@ const ProductsList = () => {
         </h1>
       </div>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto px-4 flex-1 mb-10">
-        {allProducts.map((product) => {
-          const selectedQuantity = quantities[product._id] || 1;
-          const isAdding = addingItemId === product._id;
+      {/* Search */}
+<div className="max-w-7xl mx-auto w-full px-4 mb-6">
+  <div className="relative">
 
-          return (
-            <div
-              key={product._id}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
-            >
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-56 object-cover hover:scale-105 transition-transform duration-300"
-              />
+    <Search
+      size={20}
+      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+    />
 
-              <div className="p-4">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">
-                  {product.name}
-                </h2>
+    <input
+      type="text"
+      value={search}
+      placeholder="Search products, categories..."
+      onChange={(e) => setSearch(e.target.value)}
+      className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-3 pl-12 pr-12 focus:outline-none focus:ring-2 focus:ring-green-600 dark:text-white"
+    />
 
-                <p className="text-gray-600 dark:text-gray-300 mt-1">
-                  KSH {product.priceKsh}
-                </p>
+    {search && (
+      <button
+        onClick={() => setSearch("")}
+        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+      >
+        <X size={18} />
+      </button>
+    )}
 
-                <select
-                  value={selectedQuantity}
-                  onChange={(e) =>
-                    handleQuantityChange(product._id, e.target.value)
-                  }
-                  className="mt-2 w-full border rounded-xl py-2 px-3 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
-                >
-                  {[...Array(10)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
+  </div>
 
-                <button
-                  className="mt-4 w-full bg-black dark:bg-gray-900 text-white py-2 rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-gray-700 transition disabled:opacity-60"
-                  onClick={() => handleAddToCart(product._id)}
-                  disabled={isAdding}
-                >
-                  {isAdding ? "Adding..." : "Add to Cart"}
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+  
+
+  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+    {filteredProducts.length} product
+    {filteredProducts.length !== 1 ? "s" : ""}
+    {search && (
+      <>
+        {" "}found for <span className="font-semibold">"{search}"</span>
+      </>
+    )}
+  </p>
+
+
+  {/* Product Grid */}
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto px-4 flex-1 mb-10">
+  {filteredProducts.length === 0 ? (
+    <div className="col-span-full text-center py-20">
+      <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200">
+        No products found
+      </h2>
+
+      <p className="mt-2 text-gray-500 dark:text-gray-400">
+        Try another search.
+      </p>
     </div>
+  ) : (
+    filteredProducts.map((product) => {
+      const selectedQuantity = quantities[product._id] || 1;
+      const isAdding = addingItemId === product._id;
+
+      return (
+        <div
+          key={product._id}
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden"
+        >
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-56 object-cover hover:scale-110 transition-transform duration-500"
+          />
+
+          <div className="p-4">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">
+              {product.name}
+            </h2>
+
+            <p className="text-gray-600 dark:text-gray-300 mt-1">
+              {new Intl.NumberFormat("en-KE", {
+                style: "currency",
+                currency: "KES",
+              }).format(product.priceKsh)}
+            </p>
+
+            <p className="text-sm mt-1 text-green-600 font-medium">
+              ✓ In Stock
+            </p>
+
+            <select
+              value={selectedQuantity}
+              onChange={(e) =>
+                handleQuantityChange(product._id, e.target.value)
+              }
+              className="mt-2 w-full border rounded-xl py-2 px-3 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+            >
+              {[...Array(10)].map((_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {i + 1}
+                </option>
+              ))}
+            </select>
+
+            <button
+  className="mt-4 w-full bg-black dark:bg-gray-900 text-white py-2 rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-gray-700 transition disabled:opacity-60 flex items-center justify-center"
+  onClick={() => handleAddToCart(product._id)}
+  disabled={isAdding}
+>
+  {isAdding ? (
+    <LoaderCircle className="w-5 h-5 animate-spin" />
+  ) : (
+    "Add to Cart"
+  )}
+</button>
+
+          </div>
+        </div>
+      );
+    })
+  )}
+</div>
+</div>
+</div>
+
+
   );
 };
 
