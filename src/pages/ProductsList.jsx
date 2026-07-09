@@ -6,7 +6,8 @@ import { useAddToCartMutation } from "../features/cart/cartApiSlice";
 import useAuth from "../hooks/useAuth";
 
 import useDocumentTitle from "../hooks/useDocumentTitle";
-import { Search,X ,LoaderCircle} from "lucide-react";
+import { Search,X ,LoaderCircle,Plus,Minus,ShoppingCart} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import ProductSkeleton from "../app/skeletons/ProductsSkeleton";
 
 const ProductsList = () => {
@@ -48,9 +49,19 @@ const ProductsList = () => {
   }, [message]);
 
  
-  const handleQuantityChange = (productId, value) => {
-    setQuantities((prev) => ({ ...prev, [productId]: Number(value) }));
-  };
+  const increaseQuantity = (productId) => {
+  setQuantities((prev) => ({
+    ...prev,
+    [productId]: Math.min((prev[productId] || 1) + 1, 10),
+  }));
+};
+
+const decreaseQuantity = (productId) => {
+  setQuantities((prev) => ({
+    ...prev,
+    [productId]: Math.max((prev[productId] || 1) - 1, 1),
+  }));
+};
 
   const handleAddToCart = async (productId) => {
     const quantity = quantities[productId] || 1;
@@ -59,12 +70,14 @@ const ProductsList = () => {
     try {
       await addToCart({ productId, quantity }).unwrap();
 
-    
-      setMessage(
-        quantity > 1
-          ? `${quantity} items added!`
-          : "Item added!"
-      );
+    const product = allProducts.find((p) => p._id === productId);
+
+setMessage(
+  quantity > 1
+    ? `${quantity} × ${product?.name} added to cart`
+    : `${product?.name} added to cart`
+);
+     
       setMessageType("success");
     } catch (err) {
     
@@ -120,6 +133,14 @@ const filteredProducts = allProducts.filter((product) => {
   );
 });
 
+const categoryIcons = {
+  Phones: "📱",
+  Laptops: "💻",
+  Accessories: "🎧",
+  Printers: "🖨",
+  "Smart Watches": "⌚",
+};
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
 
@@ -140,10 +161,30 @@ const filteredProducts = allProducts.filter((product) => {
 
       
       <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 shadow-md px-4 py-3 flex items-center gap-4">
+        <div className="flex overflow-x-auto gap-3 py-2 scrollbar-hide">
+  <motion.button
 
-        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 py-2">
+  initial={{
+  opacity: 0,
+  y: -15,
+}}
 
-  <button
+animate={{
+  opacity: 1,
+  y: 0,
+}}
+
+whileHover={{
+  scale: 1.08,
+}}
+
+whileTap={{
+  scale: 0.95,
+}}
+
+transition={{
+  duration: 0.3,
+}}
     onClick={() => handleCategoryClick("")}
     className={`px-5 py-2 rounded-full transition text-left sm:text-center ${
       selectedCategory === ""
@@ -152,13 +193,36 @@ const filteredProducts = allProducts.filter((product) => {
     }`}
   >
     All
-  </button>
+  </motion.button>
 
   {categories?.ids.map((id) => {
     const cat = categories.entities[id];
 
     return (
-      <button
+      <motion.button
+
+      initial={{
+  opacity: 0,
+  y: -15,
+}}
+
+animate={{
+  opacity: 1,
+  y: 0,
+}}
+
+whileHover={{
+  scale: 1.08,
+}}
+
+whileTap={{
+  scale: 0.95,
+}}
+
+transition={{
+  duration: 0.3,
+}}
+
         key={cat._id}
         onClick={() => handleCategoryClick(cat.name)}
         className={`px-5 py-2 rounded-full transition text-left sm:text-center ${
@@ -167,15 +231,22 @@ const filteredProducts = allProducts.filter((product) => {
             : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
         }`}
       >
-        {cat.name}
-      </button>
+      <>
+    {categoryIcons[cat.name] || "📦"} {cat.name}
+  </>
+      </motion.button>
     );
   })}
 </div>
       </div>
 
       {/* Welcome */}
-      <div className="max-w-7xl mx-auto mb-4 text-center mt-4 px-4">
+          <motion.div
+  initial={{ opacity: 0, y: -25 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5 }}
+  className="max-w-7xl mx-auto mb-4 text-center mt-4 px-4"
+>
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-200">
           Welcome,{" "}
           <span className="text-green-600 dark:text-green-400">
@@ -183,10 +254,24 @@ const filteredProducts = allProducts.filter((product) => {
           </span>
           !
         </h1>
-      </div>
+      </motion.div>
 
       {/* Search */}
-<div className="max-w-7xl mx-auto w-full px-4 mb-6">
+<motion.div
+  initial={{
+    opacity: 0,
+    scale: 0.95,
+  }}
+  animate={{
+    opacity: 1,
+    scale: 1,
+  }}
+  transition={{
+    duration: 0.4,
+    delay: 0.2,
+  }}
+  className="max-w-7xl mx-auto w-full px-4 mb-6"
+>
   <div className="relative">
 
     <Search
@@ -211,10 +296,14 @@ const filteredProducts = allProducts.filter((product) => {
       </button>
     )}
 
+        
+
   </div>
 
-  
 
+
+  
+  
   <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
     {filteredProducts.length} product
     {filteredProducts.length !== 1 ? "s" : ""}
@@ -225,8 +314,10 @@ const filteredProducts = allProducts.filter((product) => {
     )}
   </p>
 
+  
 
-  {/* Product Grid */}
+
+ {/* Product Grid */}
 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto px-4 flex-1 mb-10">
   {filteredProducts.length === 0 ? (
     <div className="col-span-full text-center py-20">
@@ -239,25 +330,44 @@ const filteredProducts = allProducts.filter((product) => {
       </p>
     </div>
   ) : (
-    filteredProducts.map((product) => {
+    filteredProducts.map((product, index) => {
       const selectedQuantity = quantities[product._id] || 1;
       const isAdding = addingItemId === product._id;
 
       return (
-        <div
+        <motion.div
           key={product._id}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden"
+          initial={{ opacity: 0, y: 30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          whileHover={{ y: -10, scale: 1.02 }}
+          transition={{
+            duration: 0.35,
+            delay: index * 0.05,
+          }}
+          className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl overflow-hidden"
         >
           <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-56 object-cover hover:scale-110 transition-transform duration-500"
-          />
+  src={product.image}
+  alt={product.name}
+  className="w-full h-40 sm:h-48 md:h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+/>
 
           <div className="p-4">
+            <span className="inline-block mb-2 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
+              {product.category?.name || "General"}
+            </span>
+
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">
               {product.name}
             </h2>
+
+            <div className="flex items-center mt-2">
+  <span className="text-yellow-400">★★★★★</span>
+
+  <span className="ml-2 text-sm text-gray-500">
+    (4.8)
+  </span>
+</div>
 
             <p className="text-gray-600 dark:text-gray-300 mt-1">
               {new Intl.NumberFormat("en-KE", {
@@ -266,47 +376,77 @@ const filteredProducts = allProducts.filter((product) => {
               }).format(product.priceKsh)}
             </p>
 
-            <p className="text-sm mt-1 text-green-600 font-medium">
-              ✓ In Stock
+            <p className="mt-1 text-sm text-green-600 font-medium">
+              In Stock
             </p>
 
-            <select
-              value={selectedQuantity}
-              onChange={(e) =>
-                handleQuantityChange(product._id, e.target.value)
-              }
-              className="mt-2 w-full border rounded-xl py-2 px-3 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
-            >
-              {[...Array(10)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
+            <div className="mt-4 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Quantity
+              </span>
+
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => decreaseQuantity(product._id)}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full"
+                  
+                 
+                >
+                  <Minus size={16} />
+                </button>
+
+                <span className="w-8 text-center text-lg font-semibold text-gray-900 dark:text-white">
+                  {selectedQuantity}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => increaseQuantity(product._id)}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full"
+                  >
+                  
+                  <Plus size={16} />
+                </button>
+              </div>
+            </div>
 
             <button
-  className="mt-4 w-full bg-black dark:bg-gray-900 text-white py-2 rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-gray-700 transition disabled:opacity-60 flex items-center justify-center"
-  onClick={() => handleAddToCart(product._id)}
-  disabled={isAdding}
->
-  {isAdding ? (
-    <LoaderCircle className="w-5 h-5 animate-spin" />
-  ) : (
-    "Add to Cart"
-  )}
-</button>
+              onClick={() => handleAddToCart(product._id)}
+              disabled={isAdding}
+             className="mt-4 w-full bg-gradient-to-r from-green-600 to-green-700
+text-white
+py-2.5 sm:py-3
+text-sm sm:text-base
+rounded-xl
+font-semibold
+hover:from-green-700 hover:to-green-800
+transition-all duration-300
+hover:scale-[1.02]
+active:scale-95
+shadow-lg hover:shadow-xl
+flex items-center justify-center gap-2">
+              {isAdding ? (
+                <LoaderCircle className="w-5 h-5 animate-spin" />
+              ) : (
 
+                  <>
+             <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+      <span>Add to Cart</span>
+          </>
+          
+              )}
+            </button>
           </div>
-        </div>
+        </motion.div>
       );
     })
   )}
 </div>
+    </motion.div>
 </div>
-</div>
-
-
-  );
+);
 };
+
 
 export default ProductsList;
