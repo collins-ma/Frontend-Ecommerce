@@ -6,7 +6,7 @@ import { useAddToCartMutation } from "../features/cart/cartApiSlice";
 import useAuth from "../hooks/useAuth";
 
 import useDocumentTitle from "../hooks/useDocumentTitle";
-import { Search,X ,LoaderCircle,Plus,Minus,ShoppingCart} from "lucide-react";
+import { Search,X ,LoaderCircle,Plus,Minus,ShoppingCart,Heart} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductSkeleton from "../app/skeletons/ProductsSkeleton";
 
@@ -30,6 +30,7 @@ const ProductsList = () => {
 
   const [quantities, setQuantities] = useState({});
   const [addingItemId, setAddingItemId] = useState(null);
+  const [wishlist, setWishlist] = useState({});
 
 
   
@@ -60,6 +61,14 @@ const decreaseQuantity = (productId) => {
   setQuantities((prev) => ({
     ...prev,
     [productId]: Math.max((prev[productId] || 1) - 1, 1),
+  }));
+};
+
+
+const toggleWishlist = (productId) => {
+  setWishlist((prev) => ({
+    ...prev,
+    [productId]: !prev[productId],
   }));
 };
 
@@ -344,15 +353,65 @@ transition={{
             duration: 0.35,
             delay: index * 0.05,
           }}
-          className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl overflow-hidden"
+         className="
+group
+bg-white
+dark:bg-gray-800
+rounded-2xl
+shadow-md
+hover:shadow-2xl
+overflow-hidden
+flex
+flex-col
+h-full
+"
         >
-          <img
-  src={product.image}
-  alt={product.name}
-  className="w-full h-40 sm:h-48 md:h-56 object-cover transition-transform duration-500 group-hover:scale-110"
-/>
+             <div className="relative">
+  <img
+    src={product.image}
+    alt={product.name}
+    className="
+      w-full
+      h-36
+      sm:h-44
+      md:h-56
+      object-cover
+      transition-transform
+      duration-500
+      group-hover:scale-110
+    "
+  />
 
-          <div className="p-4">
+  <button
+    onClick={() => toggleWishlist(product._id)}
+    className="
+      absolute
+      top-3
+      right-3
+      w-10
+      h-10
+      rounded-full
+      bg-white/90
+      dark:bg-gray-800/90
+      shadow-lg
+      flex
+      items-center
+      justify-center
+      hover:scale-110
+      active:scale-95
+      transition-all
+    "
+  >
+    <Heart
+      className={`w-5 h-5 transition-colors ${
+        wishlist[product._id]
+          ? "fill-red-500 text-red-500"
+          : "text-gray-500"
+      }`}
+    />
+  </button>
+</div>
+          <div className="p-3 sm:p-4" >
             <span className="inline-block mb-2 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
               {product.category?.name || "General"}
             </span>
@@ -389,7 +448,19 @@ transition={{
                 <button
                   type="button"
                   onClick={() => decreaseQuantity(product._id)}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full"
+                 className="
+w-8 h-8 sm:w-9 sm:h-9
+rounded-full
+bg-red-100
+border border-red-300
+text-red-600
+hover:bg-red-200
+hover:scale-110
+active:scale-95
+transition-all duration-200
+flex items-center justify-center
+shadow-sm
+"
                   
                  
                 >
@@ -403,7 +474,19 @@ transition={{
                 <button
                   type="button"
                   onClick={() => increaseQuantity(product._id)}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full"
+                 className="
+w-8 h-8 sm:w-9 sm:h-9
+rounded-full
+bg-green-100
+border border-green-300
+text-green-600
+hover:bg-green-200
+hover:scale-110
+active:scale-95
+transition-all duration-200
+flex items-center justify-center
+shadow-sm
+"
                   >
                   
                   <Plus size={16} />
@@ -416,8 +499,9 @@ transition={{
               disabled={isAdding}
              className="mt-4 w-full bg-gradient-to-r from-green-600 to-green-700
 text-white
-py-2.5 sm:py-3
-text-sm sm:text-base
+py-2
+sm:py-2.5
+text-xs sm:text-sm
 rounded-xl
 font-semibold
 hover:from-green-700 hover:to-green-800

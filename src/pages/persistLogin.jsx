@@ -32,9 +32,11 @@ const PersistLogin = () => {
             const verifyRefreshToken = async () => {
                
                 try {
-                    //const response = 
+                    const response = 
                     await refresh()
-                    //const { accessToken } = response.data
+
+                    console.log("response",response)
+                    const { accessToken } = response.data
                     setTrueSuccess(true)
                 }
                 catch (err) {

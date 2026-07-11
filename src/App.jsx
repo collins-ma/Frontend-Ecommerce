@@ -29,6 +29,7 @@ import { setNavigate } from './utils/navigation.jsx';
 import SettingsLayout from "./pages/SettingsLayout.jsx";
 import ChangePassword from "./pages/ChangePassword.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
+import NetworkStatus from "./pages/NetworkStatus.jsx";
 
 function App() {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ function App() {
     <>
       <Toaster position="top-center" reverseOrder={false} />
      
+       <NetworkStatus />
 
      
       <Routes>
