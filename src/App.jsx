@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-route
 import { Toaster } from "react-hot-toast";
 import CreateProduct from "./pages/CreateProduct.jsx";
 
-import ShopVista from './pages/ShopVista';
+
 import ProductsList from './pages/ProductsList';
 import Login from './pages/Login.jsx';
 import SignUp from './pages/SignUp.jsx';
@@ -48,12 +48,14 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           {/* Public routes */}
-          <Route path="/" element={<ShopVista />} />
+        <Route path="/products" element={<ProductsList />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/verify" element={<VerifyPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path ="/reset-password" element={<ResetPasswordPage/>}/>
           <Route path="/login" element={<Login />} />
+
+         <Route path="/products" element={<ProductsList />} />
 
           {/* Routes that require login + prefetch */}
           <Route element={<PersistLogin />}>
@@ -65,7 +67,7 @@ function App() {
             <Route element={<Prefetch />}>
               
               {/* User routes */}
-              <Route path="/products" element={<ProductsList />} />
+              
               
               <Route path="/cart" element={<CartPage />} />
               <Route path="/my-orders" element={<MyOrders />} />

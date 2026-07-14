@@ -4,7 +4,8 @@ import { useGetProductsQuery } from "../features/products/productsApiSlice";
 import { useGetCategoriesQuery } from "../features/categories/categoriesApiSlice";
 import { useAddToCartMutation } from "../features/cart/cartApiSlice";
 import useAuth from "../hooks/useAuth";
-
+import { useSelector } from "react-redux"
+import { selectCurrentToken } from "../auth/authSlice"
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { Search,X ,LoaderCircle,Plus,Minus,ShoppingCart,Heart} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,6 +17,8 @@ const ProductsList = () => {
   const { username } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
+
+  const token=useSelector(selectCurrentToken)
 
   const {
     data: products,
@@ -31,6 +34,7 @@ const ProductsList = () => {
   const [quantities, setQuantities] = useState({});
   const [addingItemId, setAddingItemId] = useState(null);
   const [wishlist, setWishlist] = useState({});
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
 
   
@@ -114,6 +118,12 @@ const toggleWishlist = (productId) => {
 };
 
   const handleAddToCart = async (productId) => {
+
+     if (!token) {
+    setShowLoginModal(true);
+    return;
+  }
+
     const quantity = quantities[productId] || 1;
     setAddingItemId(productId);
 
@@ -193,6 +203,113 @@ const categoryIcons = {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+
+      {showLoginModal && (
+
+<div className="
+fixed
+inset-0
+bg-black/50
+flex
+items-center
+justify-center
+z-50
+">
+
+<div className="
+bg-white
+dark:bg-gray-800
+rounded-2xl
+shadow-xl
+p-6
+w-[90%]
+max-w-md
+text-center
+">
+
+
+<h2 className="
+text-xl
+font-bold
+text-gray-800
+dark:text-white
+">
+Please login to continue
+</h2>
+
+
+<p className="
+mt-3
+text-gray-600
+dark:text-gray-300
+">
+Login or create an account for a better shopping experience.
+</p>
+
+
+
+<div className="
+flex
+gap-3
+mt-6
+justify-center
+">
+
+
+<Link
+to="/login"
+className="
+bg-green-600
+text-white
+px-5
+py-2
+rounded-xl
+font-semibold
+"
+>
+Login
+</Link>
+
+
+
+<Link
+to="/register"
+className="
+border
+border-green-600
+text-green-600
+px-5
+py-2
+rounded-xl
+font-semibold
+"
+>
+Sign Up
+</Link>
+
+
+</div>
+
+
+
+<button
+onClick={() => setShowLoginModal(false)}
+className="
+mt-4
+text-sm
+text-gray-500
+hover:text-red-500
+"
+>
+Continue browsing
+</button>
+
+
+</div>
+
+</div>
+
+)}
 
       
       {message && (

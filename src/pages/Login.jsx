@@ -99,12 +99,34 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md flex flex-col gap-4 text-black">
-        <h2 className="text-3xl font-bold text-center mb-6">
-          Login to ShopVista
-        </h2>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+     <div
+className="
+w-full
+max-w-md
+bg-white
+dark:bg-gray-800
+rounded-3xl
+shadow-2xl
+border
+border-gray-200
+dark:border-gray-700
+p-8
+flex
+flex-col
+gap-5
+"
+>
+      
+    <div className="text-center">
+<h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+Welcome Back
+</h2>
 
+<p className="text-gray-500 dark:text-gray-400 mt-2">
+Sign in to continue shopping.
+</p>
+</div>
        {errorMessage && (
        <p className="text-red-600 text-center font-semibold">
       {errorMessage}
@@ -118,7 +140,25 @@ function Login() {
             placeholder="Username"
             autoComplete="username"
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+      className="
+w-full
+px-4
+py-3
+rounded-xl
+border
+border-gray-300
+bg-white
+dark:bg-gray-700
+dark:border-gray-600
+text-gray-800
+dark:text-white
+placeholder:text-gray-400
+focus:outline-none
+focus:ring-2
+focus:ring-green-600
+focus:border-green-600
+transition
+"
           />
 
           <div className="relative">
@@ -128,13 +168,40 @@ function Login() {
               placeholder="Password"
               autoComplete="current-password"
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pr-10 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+             className="
+w-full
+px-4
+pr-12
+py-3
+rounded-xl
+border
+border-gray-300
+bg-white
+dark:bg-gray-700
+dark:border-gray-600
+text-gray-800
+dark:text-white
+placeholder:text-gray-400
+focus:outline-none
+focus:ring-2
+focus:ring-green-600
+focus:border-green-600
+transition
+"
             />
 
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-black"
+          className="
+absolute
+right-4
+top-1/2
+-translate-y-1/2
+text-gray-400
+hover:text-green-600
+transition
+"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
@@ -144,26 +211,60 @@ function Login() {
             <button
               type="button"
               onClick={() => navigate("/forgot-password")}
-              className="text-sm text-orange-500 hover:underline"
+             className="text-green-600 hover:text-green-700"
             >
               Forgot Password?
             </button>
           </div>
+<label
+  className="
+    flex
+    items-center
+    gap-3
+    text-gray-700
+    dark:text-gray-300
+    text-sm
+    select-none
+    cursor-pointer
+  "
+>
+  <input
+    type="checkbox"
+    checked={persist}
+    onChange={() => setPersist((prev) => !prev)}
+    className="
+      w-4
+      h-4
+      rounded
+      accent-green-600
+      cursor-pointer
+    "
+  />
 
-          <label className="flex items-center gap-2 text-gray-700">
-            <input
-              type="checkbox"
-              checked={persist}
-              onChange={() => setPersist((prev) => !prev)}
-              className="w-4 h-4"
-            />
-            Remember me
-          </label>
-
+  <span>Keep me logged in</span>
+</label>
           <button
             type="submit"
             disabled={isLoading}
-            className="p-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition disabled:opacity-50"
+            className="
+w-full
+bg-gradient-to-r
+from-green-600
+to-green-700
+text-white
+py-3
+rounded-xl
+font-semibold
+hover:from-green-700
+hover:to-green-800
+transition-all
+duration-300
+hover:scale-[1.02]
+active:scale-95
+shadow-lg
+hover:shadow-xl
+disabled:opacity-50
+"
           >
             {isLoading ? "Logging in..." : "Login"}
           </button>
@@ -173,7 +274,7 @@ function Login() {
           Don't have an account?{" "}
           <Link
             to="/signup"
-            className="text-orange-500 font-semibold hover:underline"
+            className="text-green-600 hover:text-green-700"
           >
             Sign Up
           </Link>
