@@ -35,7 +35,6 @@ const PersistLogin = () => {
                     const response = 
                     await refresh()
 
-                    console.log("response",response)
                     const { accessToken } = response.data
                     setTrueSuccess(true)
                 }
