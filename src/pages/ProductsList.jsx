@@ -37,7 +37,48 @@ const ProductsList = () => {
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [activeBanner, setActiveBanner] = useState(0);
 
+  const banners = [
+  {
+    title: "🔥 Big Electronics Sale",
+    description: "Up to 30% OFF Smartphones, Laptops & Accessories",
+    button: "Shop Now",
+    image: "/banners/iphone.jpg",
+  },
+
+  {
+    title: "🚚 Free Delivery",
+    description: "For orders above KSh 5,000",
+    button: "Shop Now",
+    image: "/banners/delivery.jpg",
+  },
+
+  {
+    title: "🆕 New Arrivals",
+    description: "Gaming laptops and wireless earbuds available now",
+    button: "Explore",
+    image: "/banners/gaming-laptop.jpg",
+  },
+  ]
+
+
+  useEffect(() => {
+
+  const timer = setInterval(() => {
+
+    setActiveBanner((current) =>
+      current === banners.length - 1
+        ? 0
+        : current + 1
+    );
+
+  }, 4000);
+
+
+  return () => clearInterval(timer);
+
+}, []);
   
   useEffect(() => {
     if (message) {
@@ -248,6 +289,101 @@ transition={{
   })}
 </div>
       </div>
+
+
+<motion.div
+  key={activeBanner}
+  initial={{ opacity: 0, x: 30 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ duration: 0.4 }}
+  className="
+    max-w-7xl
+    mx-auto
+    w-full
+    px-4
+    mt-4
+  "
+>
+
+<div
+className="
+rounded-2xl
+overflow-hidden
+bg-white
+dark:bg-gray-800
+shadow-md
+grid
+grid-cols-2
+items-center
+h-32
+"
+>
+
+<div className="p-3 md:p-4">
+
+<h2
+className="
+text-sm
+md:text-lg
+font-bold
+text-gray-800
+dark:text-white
+"
+>
+{banners[activeBanner].title}
+</h2>
+
+
+<p
+className="
+mt-1
+text-xs
+md:text-sm
+text-gray-600
+dark:text-gray-300
+line-clamp-2
+"
+>
+{banners[activeBanner].description}
+</p>
+
+
+<button
+className="
+mt-2
+bg-green-600
+text-white
+px-3
+py-1
+text-xs
+rounded-lg
+font-semibold
+hover:bg-green-700
+transition
+"
+>
+{banners[activeBanner].button}
+</button>
+
+
+</div>
+
+
+<img
+src={banners[activeBanner].image}
+alt={banners[activeBanner].title}
+className="
+w-full
+h-32
+object-cover
+"
+/>
+
+
+</div>
+
+</motion.div>
+
 
       {/* Welcome */}
           <motion.div
