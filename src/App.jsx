@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate,Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import CreateProduct from "./pages/CreateProduct.jsx";
 
@@ -48,17 +48,23 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           {/* Public routes */}
-        <Route path="/products" element={<ProductsList />} />
+          
+           <Route index element={<ProductsList />} />
+
+        
           <Route path="/signup" element={<SignUp />} />
           <Route path="/verify" element={<VerifyPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path ="/reset-password" element={<ResetPasswordPage/>}/>
           <Route path="/login" element={<Login />} />
 
-         <Route path="/products" element={<ProductsList />} />
+
 
           {/* Routes that require login + prefetch */}
           <Route element={<PersistLogin />}>
+
+          <Route path="/products" element={<ProductsList />} />
+           
             {/* Wrap all child routes in Prefetch */}
 
             <Route  element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />} >

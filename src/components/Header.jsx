@@ -103,6 +103,20 @@ const toggleMenu = () => {
     }
   };
 
+  const requireLogin = (path) => {
+  if (!token) {
+    navigate("/login", {
+      state: {
+        from: path,
+        showLoginModal: true,
+      },
+    });
+    return;
+  }
+
+  navigate(path);
+};
+
   const themeIcons = { system: "🖥️", light: "☀️", dark: "🌙" };
   const publicPages = ["/login", "/signup", "/", "/verify", "/forgot-password","/reset-password"];
   const isPublicPage = publicPages.includes(location.pathname);
@@ -148,7 +162,7 @@ const toggleMenu = () => {
           )}
         </div>
 
-        {!isPublicPage && token && (
+        {!isPublicPage && (
   <div className="flex items-center gap-3">
 
     <div className="relative" ref={menuRef}>
@@ -186,9 +200,10 @@ const toggleMenu = () => {
 `}
         >
 
-          <Link
-            to="/cart"
-            className="
+        <button
+  onClick={() => requireLogin("/cart")}
+  className="
+w-full
 flex
 items-center
 gap-3
@@ -202,35 +217,32 @@ dark:hover:bg-green-900/20
 transition-all
 duration-200
 "
-          >
-          <FiShoppingCart className="text-lg text-green-600" />
-            Cart
-          </Link>
-
-          <Link
-            to="/my-orders"
-            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-          <FiPackage className="text-lg text-green-600" />
-            My Orders
-          </Link>
-
-          <Link
-            to="/change-profile"
-            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-         <FiUser className="text-lg text-green-600" />
-            Profile
-          </Link>
-
-          <Link
-            to="/settings"
-            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            <FiSettings className="text-lg text-green-600" />
-            Settings
-          </Link>
-
+>
+  <FiShoppingCart className="text-lg text-green-600" />
+  Cart
+</button>
+          <button
+  onClick={() => requireLogin("/my-orders")}
+  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
+>
+  <FiPackage className="text-lg text-green-600" />
+  My Orders
+</button>
+          <button
+  onClick={() => requireLogin("/change-profile")}
+  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
+>
+  <FiUser className="text-lg text-green-600" />
+  Profile
+</button>
+          
+        <button
+  onClick={() => requireLogin("/settings")}
+  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
+>
+  <FiSettings className="text-lg text-green-600" />
+  Settings
+</button>
           <hr />
 
      <div className="px-5 py-4 bg-gray-50 dark:bg-gray-800">
@@ -293,9 +305,10 @@ transition
 
           <hr />
 
-          <button
-            onClick={handleLogout}
-           className="
+          {token ? (
+  <button
+    onClick={handleLogout}
+    className="
 w-full
 flex
 items-center
@@ -308,10 +321,37 @@ hover:bg-red-50
 dark:hover:bg-red-900/20
 transition
 "
-          >
-           <FiLogOut className="text-lg" />
-            Logout
-          </button>
+  >
+    <FiLogOut className="text-lg" />
+    Logout
+  </button>
+) : (
+  <button
+    onClick={() =>
+      navigate("/login", {
+        state: {
+          showLoginModal: true,
+        },
+      })
+    }
+    className="
+w-full
+flex
+items-center
+gap-3
+px-5
+py-3
+font-semibold
+text-green-600
+hover:bg-green-50
+dark:hover:bg-green-900/20
+transition
+"
+  >
+    <FiUser className="text-lg" />
+    Login / Create Account
+  </button>
+)}
 
         </div>
       )}

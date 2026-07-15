@@ -63,19 +63,22 @@ const PersistLogin = () => {
         content = <PulseLoader color={"#FFF"} />
     } else if (isError) { //persist: yes, token: no
    
-   content = (
-  <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
-    <p className="text-red-600 font-medium">
-      {(error?.data?.message ?? "Your session has expired. Please log in again.")}{" - "}
-      <Link
-        to="/login"
-        className="text-blue-600 hover:underline font-semibold"
-      >
-        Login
-      </Link>
-    </p>
-  </div>
-);
+         // Refresh failed.
+    // User is simply treated as a guest.
+    content = <Outlet />;
+//    content = (
+//   <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
+//     <p className="text-red-600 font-medium">
+//       {(error?.data?.message ?? "Your session has expired. Please log in again.")}{" - "}
+//       <Link
+//         to="/login"
+//         className="text-blue-600 hover:underline font-semibold"
+//       >
+//         Login
+//       </Link>
+//     </p>
+//   </div>
+// );
     } else if (isSuccess && trueSuccess) { //persist: yes, token: yes
         
         content = <Outlet />
