@@ -2,9 +2,9 @@ import { Outlet, Link } from "react-router-dom"
 import { useEffect, useRef, useState } from 'react'
 import { useRefreshMutation } from "../auth/authApiSlice"
 import usePersist from "../hooks/usePersist"
-import { useSelector } from 'react-redux'
-import { selectCurrentToken } from "../auth/authSlice"
-import PulseLoader from 'react-spinners/PulseLoader'
+import { useSelector,useDispatch } from 'react-redux'
+import { selectCurrentToken,setRefreshing } from "../auth/authSlice"
+import { LoaderCircle } from "lucide-react";
 import React from 'react'
 import { Navigate } from "react-router-dom"
 const PersistLogin = () => {
@@ -15,6 +15,8 @@ const PersistLogin = () => {
     const effectRan = useRef(false)
 
     const [trueSuccess, setTrueSuccess] = useState(false)
+
+    const dispatch=useDispatch()
 
     const [refresh, {
         isUninitialized,
@@ -27,11 +29,14 @@ const PersistLogin = () => {
 
     useEffect(() => {
 
-        if (effectRan.current === true || process.env.NODE_ENV !== 'development') { // React 18 Strict Mode
-
+        if (effectRan.current === true || process.env.NODE_ENV !== 'development')
+             { // React 18 Strict Mode
+             
             const verifyRefreshToken = async () => {
+                   dispatch(setRefreshing(true))
                
                 try {
+                      
                     const response = 
                     await refresh()
 
@@ -41,10 +46,24 @@ const PersistLogin = () => {
                 catch (err) {
                     console.error(err)
                 }
+
+                finally{
+
+                    dispatch(setRefreshing(false))
+                }
             }
 
-            if (!token && persist) verifyRefreshToken()
+            if (!token && persist)
+
+                
+                     verifyRefreshToken()
+                
+              
         }
+
+        else {
+    dispatch(setRefreshing(false));
+}
 
         return () => effectRan.current = true
 
@@ -57,10 +76,13 @@ const PersistLogin = () => {
     if (!persist) {
     content=<Outlet/>
 }
+    else if (isLoading) {
+  content = (
+    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
+      <LoaderCircle className="w-6 h-6 text-green-600 animate-spin" />
+    </div>
+  );
 
-     else if (isLoading) { //persist: yes, token: no
-     
-        content = <PulseLoader color={"#FFF"} />
     } else if (isError) { //persist: yes, token: no
    
          // Refresh failed.

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLoginMutation } from "../auth/authApiSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { LoaderCircle } from "lucide-react";
 import {
   setCredentials,
   clearAuthError,
@@ -244,30 +245,41 @@ transition
   <span>Keep me logged in</span>
 </label>
           <button
-            type="submit"
-            disabled={isLoading}
-            className="
-w-full
-bg-gradient-to-r
-from-green-600
-to-green-700
-text-white
-py-3
-rounded-xl
-font-semibold
-hover:from-green-700
-hover:to-green-800
-transition-all
-duration-300
-hover:scale-[1.02]
-active:scale-95
-shadow-lg
-hover:shadow-xl
-disabled:opacity-50
-"
-          >
-            {isLoading ? "Logging in..." : "Login"}
-          </button>
+  type="submit"
+  disabled={isLoading}
+  className="
+    w-full
+    bg-gradient-to-r
+    from-green-600
+    to-green-700
+    text-white
+    py-3
+    rounded-xl
+    font-semibold
+    hover:from-green-700
+    hover:to-green-800
+    transition-all
+    duration-300
+    hover:scale-[1.02]
+    active:scale-95
+    shadow-lg
+    hover:shadow-xl
+    disabled:opacity-50
+    flex
+    items-center
+    justify-center
+    gap-2
+  "
+>
+  {isLoading ? (
+    <>
+      <span>Logging in...</span>
+      <LoaderCircle className="w-5 h-5 text-white animate-spin" />
+    </>
+  ) : (
+    "Login"
+  )}
+</button>
         </form>
 
         <div className="text-center mt-4 text-gray-600">

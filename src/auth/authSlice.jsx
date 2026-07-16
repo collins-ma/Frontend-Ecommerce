@@ -3,7 +3,9 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   token: null,
   needsVerification: null,
-  authError:null
+  authError:null,
+  isRefreshing:false
+
 };
 
 
@@ -33,13 +35,17 @@ const authSlice = createSlice({
     },
     clearAuthError:(state)=>{
       state.authError=null
+    },
+    setRefreshing:(state,action)=>{
+      state.isRefreshing=action.payload
     }
   },
 });
 
 export const selectCurrentToken = (state) => state.auth.token;
 export const selectAuthError=(state)=>state.auth.authError
+export const selectIsRefreshing = (state) => state.auth.isRefreshing;
 export const selectNeedsVerification = (state) => state.auth.needsVerification;
 
-export const { setCredentials, logOut,setAuthError,clearAuthError } = authSlice.actions;
+export const { setCredentials, logOut,setAuthError,clearAuthError ,setRefreshing} = authSlice.actions;
 export default authSlice.reducer;

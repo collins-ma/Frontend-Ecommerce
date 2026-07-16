@@ -435,8 +435,8 @@ items-center
 h-32
 "
 >
+<div className="p-3 sm:p-4 flex flex-col flex-1">
 
-<div className="p-3 md:p-4">
 
 <h2
 className="
@@ -607,7 +607,7 @@ object-cover
             delay: index * 0.05,
           }}
          className="
-group
+          group
 bg-white
 dark:bg-gray-800
 rounded-2xl
@@ -617,18 +617,22 @@ overflow-hidden
 flex
 flex-col
 h-full
+min-h-[640px]
 "
+
         >
-             <div className="relative">
+   
+   
+          <div className="relative bg-gray-100 dark:bg-gray-700 h-56 flex items-center justify-center">
+
   <img
     src={product.image}
     alt={product.name}
     className="
-      w-full
-      h-36
-      sm:h-44
-      md:h-56
-      object-cover
+      max-w-full
+      max-h-full
+      object-contain
+      p-3
       transition-transform
       duration-500
       group-hover:scale-110
@@ -656,20 +660,28 @@ h-full
     "
   >
     <Heart
-      className={`w-5 h-5 transition-colors ${
+      className={`w-5 h-5 ${
         wishlist[product._id]
           ? "fill-red-500 text-red-500"
           : "text-gray-500"
       }`}
     />
   </button>
+
 </div>
           <div className="p-3 sm:p-4" >
             <span className="inline-block mb-2 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
               {product.category?.name || "General"}
             </span>
 
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">
+            <h2 className="className=
+text-lg
+font-semibold
+text-gray-800
+dark:text-gray-200
+line-clamp-2
+min-h-[56px]
+">
               {product.name}
             </h2>
 
@@ -750,7 +762,7 @@ shadow-sm
             <button
               onClick={() => handleAddToCart(product._id)}
               disabled={isAdding}
-             className="mt-4 w-full bg-gradient-to-r from-green-600 to-green-700
+             className="mt-auto w-full bg-gradient-to-r from-green-600 to-green-700
 text-white
 py-2
 sm:py-2.5

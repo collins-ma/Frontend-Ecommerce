@@ -13,10 +13,19 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import CartIcon from "../pages/CartIcon";
 import useAuth from "../hooks/useAuth";
 import {useSelector} from "react-redux"
-import { selectCurrentToken } from "../auth/authSlice";
-
+import { selectCurrentToken, selectIsRefreshing } from "../auth/authSlice";
+import { setRefreshing } from "../auth/authSlice";
+import usePersist from "../hooks/usePersist";
+import { LoaderCircle } from "lucide-react";
 export default function Header() {
+
+  const isRefreshing=useSelector(selectIsRefreshing)
+
+  const [persist]=usePersist()
+
   const { isAdmin } = useAuth();
+
+  
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "system"
   );
@@ -305,22 +314,26 @@ transition
 
           <hr />
 
-          {token ? (
+        {persist && isRefreshing ? (
+  <div className="w-full flex justify-center py-4">
+    <LoaderCircle className="w-6 h-6 text-green-600 animate-spin" />
+  </div>
+) : token ? (
   <button
     onClick={handleLogout}
     className="
-w-full
-flex
-items-center
-gap-3
-px-5
-py-3
-font-semibold
-text-red-500
-hover:bg-red-50
-dark:hover:bg-red-900/20
-transition
-"
+      w-full
+      flex
+      items-center
+      gap-3
+      px-5
+      py-3
+      font-semibold
+      text-red-500
+      hover:bg-red-50
+      dark:hover:bg-red-900/20
+      transition
+    "
   >
     <FiLogOut className="text-lg" />
     Logout
@@ -335,24 +348,23 @@ transition
       })
     }
     className="
-w-full
-flex
-items-center
-gap-3
-px-5
-py-3
-font-semibold
-text-green-600
-hover:bg-green-50
-dark:hover:bg-green-900/20
-transition
-"
+      w-full
+      flex
+      items-center
+      gap-3
+      px-5
+      py-3
+      font-semibold
+      text-green-600
+      hover:bg-green-50
+      dark:hover:bg-green-900/20
+      transition
+    "
   >
     <FiUser className="text-lg" />
     Login / Create Account
   </button>
 )}
-
         </div>
       )}
 
