@@ -18,6 +18,8 @@ export default function CheckoutPage() {
   const [shippingCity, setShippingCity] = useState("");
   const [shippingZip, setShippingZip] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("mpesa");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [currentOrderId, setCurrentOrderId] = useState(null);
   const [orderStatus, setOrderStatus] = useState(null);
@@ -46,23 +48,50 @@ export default function CheckoutPage() {
   }, [orderStatus, navigate]);
 
   const handlePayment = async () => {
-    if (!shippingStreet || !shippingCity || !shippingZip || !phoneNumber) return;
+   if (
+    !shippingStreet ||
+    !shippingCity ||
+    !shippingZip
+) {
+    return;
+}
+
+if (paymentMethod === "mpesa" && !phoneNumber) {
+    return;
+}
 
     try {
+      
       const response = await initiatePayment({
-        method: "mpesa",
-        phoneNumber,
-        shippingAddress: {
-          name: shippingName,
-          street: shippingStreet,
-          city: shippingCity,
-          zip: shippingZip,
-          phone: phoneNumber,
-        },
-      }).unwrap();
+    paymentMethod,
+    phoneNumber:
+        paymentMethod === "mpesa"
+            ? phoneNumber
+            : undefined,
 
-      setCurrentOrderId(response.orderId);
-      setOrderStatus("pending");
+    shippingAddress: {
+        name: shippingName,
+        street: shippingStreet,
+        city: shippingCity,
+        zip: shippingZip,
+        phone:
+            paymentMethod === "mpesa"
+                ? phoneNumber
+                : "",
+    },
+}).unwrap();
+      if (response.method === "mpesa") {
+  setCurrentOrderId(response.orderId);
+  setOrderStatus("pending");
+} else {
+  setSuccessMessage(
+    "Order placed successfully. You selected Cash on Delivery. Please pay when your order arrives."
+  );
+
+  setTimeout(() => {
+    navigate("/my-orders");
+  }, 3000);
+}
     } catch (err) {
       setOrderStatus("failed");
       console.error(err);
@@ -130,13 +159,42 @@ export default function CheckoutPage() {
             onChange={(e) => setShippingZip(e.target.value)}
             className="w-full border rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
           />
-          <input
-            type="tel"
-            placeholder="Phone Number (+2547xxxxxxx)"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
-          />
+
+           
+           <div className="mt-4">
+  <p className="mb-2 font-medium text-gray-700 dark:text-gray-200">
+    Payment Method
+  </p>
+
+  <label className="flex items-center gap-2 mb-2 cursor-pointer">
+    <input
+      type="radio"
+      value="mpesa"
+      checked={paymentMethod === "mpesa"}
+      onChange={(e) => setPaymentMethod(e.target.value)}
+    />
+    <span>M-Pesa</span>
+  </label>
+
+  <label className="flex items-center gap-2 cursor-pointer">
+    <input
+      type="radio"
+      value="cash_on_delivery"
+      checked={paymentMethod === "cash_on_delivery"}
+      onChange={(e) => setPaymentMethod(e.target.value)}
+    />
+    <span>Cash on Delivery</span>
+  </label>
+</div>
+         {paymentMethod === "mpesa" && (
+  <input
+    type="tel"
+    placeholder="Phone Number (+2547xxxxxxxx)"
+    value={phoneNumber}
+    onChange={(e) => setPhoneNumber(e.target.value)}
+    className="w-full border rounded-lg px-3 py-2 bg-white dark:bg-gray-700"
+  />
+)}
         </div>
 
         <button
@@ -144,9 +202,12 @@ export default function CheckoutPage() {
           disabled={isPaying || orderStatus === "pending"}
           className="mt-6 w-full bg-green-600 dark:bg-green-500 text-white dark:text-gray-900 py-3 rounded-lg font-medium hover:bg-green-700 dark:hover:bg-green-600 transition"
         >
-          {isPaying || orderStatus === "pending"
-            ? "Processing..."
-            : "Pay with M-Pesa"}
+        {isPaying || orderStatus === "pending"
+    ? "Processing..."
+    : paymentMethod === "mpesa"
+    ? "Pay with M-Pesa"
+    : "Place Order"}
+
         </button>
       </div>
     </div>
