@@ -1,160 +1,740 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetOrderByIdQuery } from "../features/orders/ordersApiSlice";
-import { FiCheckCircle, FiXCircle, FiClock } from "react-icons/fi";
+
+import {
+  FiArrowLeft,
+  FiPackage,
+  FiCreditCard,
+  FiMapPin,
+  FiXCircle,
+} from "react-icons/fi";
+
 import useDocumentTitle from "../hooks/useDocumentTitle";
 
-const OrderDetail = () => {
-  useDocumentTitle("orderdetails");
+import {
+  useGetOrderByIdQuery,
+  useCancelOrderMutation,
+} from "../features/orders/ordersApiSlice";
+
+import CancelOrderModal from "../components/CancelOrderModal";
+
+
+export default function OrderDetail() {
+
+
+  useDocumentTitle("Order Details");
+
+
   const { id } = useParams();
+
   const navigate = useNavigate();
 
-  const { data: orderState, isLoading, isError, error } = useGetOrderByIdQuery(id);
 
-  if (isLoading)
+  const [showCancelModal, setShowCancelModal] = useState(false);
+
+
+
+  const {
+    data: order,
+    isLoading,
+    isError,
+    error,
+  } = useGetOrderByIdQuery(id);
+
+
+
+
+  const [
+    cancelOrder,
+    {
+      isLoading: isCancelling
+    }
+  ] = useCancelOrderMutation();
+
+
+
+
+
+  const handleCancel = async(reason)=>{
+
+
+    console.log("CANCEL REASON:", reason);
+
+
+    try {
+
+
+      await cancelOrder({
+        id,
+        reason
+      }).unwrap();
+
+
+
+      setShowCancelModal(false);
+
+
+
+    } catch(error){
+
+      console.log(error);
+
+    }
+
+
+  };
+
+
+
+
+
+
+
+  if(isLoading){
+
     return (
-      <div className="text-center p-6 text-gray-600 dark:text-gray-300">
+
+      <div className="
+        min-h-screen
+        flex
+        items-center
+        justify-center
+      ">
+
         Loading order details...
+
       </div>
+
     );
 
-  if (isError || !orderState)
-    return (
-      <div className="text-center p-6 text-red-600 dark:text-red-400 font-semibold">
-        {error?.data?.message || "Failed to fetch order"}
-      </div>
-    );
-
-  const order = orderState.entities ? orderState.entities[id] : orderState;
-
-  if (!order)
-    return (
-      <div className="text-center p-6 text-red-600 dark:text-red-400">Order not found.</div>
-    );
-
-  
-  let PaymentIcon, paymentColor;
-  switch ((order.paymentStatus || "").toLowerCase()) {
-    case "paid":
-      PaymentIcon = FiCheckCircle;
-      paymentColor = "bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-300";
-      break;
-    case "failed":
-      PaymentIcon = FiXCircle;
-      paymentColor = "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-300";
-      break;
-    default:
-      PaymentIcon = FiClock;
-      paymentColor = "bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-300";
   }
 
-  const statusColor =
-    order.status === "failed"
-      ? "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-300"
-      : order.status === "success"
-      ? "bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-300"
-      : "bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-300";
 
-  return (
-    <div className="p-4 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <button
-        onClick={() => navigate("/admin/orders")}
-        className="mb-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
-      >
-        ← Back to Orders
-      </button>
 
-      
-      <div className="hidden md:block overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 shadow-xl rounded-2xl">
-          <thead className="bg-gray-100 dark:bg-gray-700">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase">Order ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase">User</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase">Items</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase">Total</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase">Payment</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase">Shipping</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase">Failure Reason</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="hover:bg-purple-50 dark:hover:bg-purple-900 transition">
-              <td className="px-6 py-4 text-sm text-gray-800 dark:text-gray-200">{order._id}</td>
-              <td className="px-6 py-4 text-sm text-gray-800 dark:text-gray-200">{order.user?.name || order.user?._id || "-"}</td>
-              <td className="px-6 py-4 text-sm text-gray-800 dark:text-gray-200">
-                {order.items?.length > 0
-                  ? order.items.map((item, idx) => (
-                      <div key={idx}>
-                        {item.product?.name || item.product?._id} | Qty: {item.quantity} | ${item.priceUSD}
-                      </div>
-                    ))
-                  : "-"}
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-800 dark:text-gray-200">${order.total}</td>
-              <td className="px-6 py-4">
-                <span className={`px-2 py-1 inline-flex text-xs font-semibold rounded-full ${statusColor}`}>
-                  {order.status}
-                </span>
-              </td>
-              <td className="px-6 py-4">
-                <span className={`flex items-center gap-1 px-2 py-1 inline-flex text-xs font-semibold rounded-full ${paymentColor}`}>
-                  <PaymentIcon className="w-4 h-4" />
-                  {order.paymentStatus} ({order.paymentMethod || "N/A"})
-                </span>
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-800 dark:text-gray-200">
-                {order.shippingAddress
-                  ? `${order.shippingAddress.name}, ${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.zip}, ${order.shippingAddress.phone}`
-                  : "-"}
-              </td>
-              <td className="px-6 py-4 text-sm text-red-600 dark:text-red-400">{order.failureReason || "-"}</td>
-            </tr>
-          </tbody>
-        </table>
+
+
+
+  if(isError || !order){
+
+    return (
+
+      <div className="
+        min-h-screen
+        flex
+        items-center
+        justify-center
+        text-red-600
+      ">
+
+        {
+          error?.data?.message ||
+          "Failed to load order"
+        }
+
       </div>
 
-      
-      <div className="md:hidden flex flex-col gap-4">
-        <div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="font-semibold text-gray-800 dark:text-gray-200">{order._id}</span>
-            <span className={`px-2 inline-flex text-xs font-semibold rounded-full ${statusColor}`}>
-              {order.status}
-            </span>
-          </div>
-          <div className="text-gray-600 dark:text-gray-300 mb-1">
-            User: {order.user?.name || order.user?._id || "-"}
-          </div>
-          <div className="text-gray-600 dark:text-gray-300 mb-1">
-            Items: {order.items?.length > 0
-              ? order.items.map((item, idx) => (
-                  <span key={idx}>
-                    {item.product?.name || item.product?._id} x{item.quantity}${item.priceUSD}{idx < order.items.length - 1 ? ", " : ""}
-                  </span>
-                ))
-              : "-"}
-          </div>
-          <div className="text-gray-800 dark:text-gray-200 font-medium mb-1">
-            Total: ${order.total}
-          </div>
-          <div className={`px-2 py-1 inline-flex text-xs font-semibold rounded-full ${paymentColor} mb-1`}>
-            <PaymentIcon className="w-4 h-4 mr-1 inline" />
-            {order.paymentStatus} ({order.paymentMethod || "N/A"})
-          </div>
-          <div className="text-gray-600 dark:text-gray-300 mb-1">
-            Shipping: {order.shippingAddress
-              ? `${order.shippingAddress.name}, ${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.zip}, ${order.shippingAddress.phone}`
-              : "-"}
-          </div>
-          <div className="text-red-600 dark:text-red-400">
-            Failure Reason: {order.failureReason || "-"}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+    );
 
-export default OrderDetail;
+  }
+
+
+
+
+
+
+
+  // customer can cancel only pending and processing
+
+  const canCancel =
+    order.orderStatus?.toLowerCase() === "pending" ||
+    order.orderStatus?.toLowerCase() === "processing";
+
+
+
+
+
+
+
+  const orderColors = {
+
+
+    pending:
+      "bg-yellow-100 text-yellow-700",
+
+    confirmed:
+      "bg-blue-100 text-blue-700",
+
+    processing:
+      "bg-purple-100 text-purple-700",
+
+    shipped:
+      "bg-indigo-100 text-indigo-700",
+
+    delivered:
+      "bg-green-100 text-green-700",
+
+    cancelled:
+      "bg-red-100 text-red-700",
+
+
+  };
+
+
+
+
+
+
+
+  const paymentColors = {
+
+
+    pending:
+      "bg-yellow-100 text-yellow-700",
+
+    paid:
+      "bg-green-100 text-green-700",
+
+    failed:
+      "bg-red-100 text-red-700",
+
+    refund_pending:
+      "bg-orange-100 text-orange-700",
+
+    refunded:
+      "bg-green-100 text-green-700",
+
+
+  };
+
+
+
+
+
+
+
+
+
+return (
+
+<div className="
+min-h-screen
+bg-gray-50
+dark:bg-gray-900
+p-5 md:p-10
+">
+
+
+
+
+
+
+
+<button
+
+onClick={()=>navigate("/my-orders")}
+
+className="
+flex
+items-center
+gap-2
+bg-green-600
+hover:bg-green-700
+text-white
+px-4
+py-2
+rounded-xl
+mb-6
+"
+
+>
+
+<FiArrowLeft/>
+
+Back To Orders
+
+</button>
+
+
+
+
+
+
+
+
+
+<div className="
+max-w-5xl
+mx-auto
+bg-white
+dark:bg-gray-800
+rounded-3xl
+shadow-lg
+p-6
+">
+
+
+
+
+
+
+
+{/* HEADER */}
+
+
+<div className="
+flex
+flex-col
+md:flex-row
+justify-between
+gap-4
+">
+
+
+
+<div>
+
+<p className="text-gray-500">
+
+Order Number
+
+</p>
+
+
+
+<h1 className="
+text-2xl
+font-bold
+dark:text-white
+">
+
+#{order._id.slice(-8).toUpperCase()}
+
+</h1>
+
+
+</div>
+
+
+
+
+
+<div className="flex gap-3">
+
+
+
+<span
+
+className={`
+px-3
+py-2
+rounded-full
+font-semibold
+text-sm
+${orderColors[order.orderStatus]}
+`}
+
+>
+
+{order.orderStatus}
+
+</span>
+
+
+
+
+
+<span
+
+className={`
+px-3
+py-2
+rounded-full
+font-semibold
+text-sm
+${paymentColors[order.paymentStatus]}
+`}
+
+>
+
+{order.paymentStatus}
+
+</span>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* ITEMS */}
+
+
+<div className="mt-8">
+
+
+<h2 className="
+font-bold
+dark:text-white
+flex
+items-center
+gap-2
+">
+
+<FiPackage/>
+
+Items
+
+</h2>
+
+
+
+
+<div className="mt-4 space-y-3">
+
+
+{
+
+order.items.map((item,index)=>(
+
+
+<div
+
+key={index}
+
+className="
+flex
+justify-between
+bg-gray-100
+dark:bg-gray-700
+rounded-xl
+p-4
+"
+
+>
+
+
+<div>
+
+
+<p className="
+font-semibold
+dark:text-white
+">
+
+{item.product?.name || "Product"}
+
+</p>
+
+
+
+<p className="text-gray-500 text-sm">
+
+Quantity: {item.quantity}
+
+</p>
+
+
+</div>
+
+
+
+
+<p className="
+font-bold
+text-green-600
+">
+
+KSh {item.priceksh.toLocaleString()}
+
+</p>
+
+
+</div>
+
+
+))
+
+}
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* TOTAL */}
+
+
+<div className="
+mt-8
+border-t
+pt-5
+flex
+justify-between
+">
+
+
+<span className="
+font-semibold
+dark:text-white
+">
+
+Total
+
+</span>
+
+
+
+
+<span className="
+text-2xl
+font-bold
+text-green-600
+">
+
+KSh {order.total.toLocaleString()}
+
+</span>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* PAYMENT */}
+
+
+<div className="mt-8">
+
+
+<h2 className="
+font-bold
+dark:text-white
+flex
+items-center
+gap-2
+">
+
+<FiCreditCard/>
+
+Payment
+
+</h2>
+
+
+
+
+<p className="
+text-gray-600
+dark:text-gray-300
+mt-2
+">
+
+Method: {order.checkoutMethod}
+
+</p>
+
+
+
+
+{
+order.transactionId &&
+
+<p className="
+text-gray-600
+dark:text-gray-300
+">
+
+Transaction: {order.transactionId}
+
+</p>
+
+}
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* SHIPPING */}
+
+
+<div className="mt-8">
+
+
+<h2 className="
+font-bold
+dark:text-white
+flex
+items-center
+gap-2
+">
+
+<FiMapPin/>
+
+Shipping Address
+
+</h2>
+
+
+
+
+<div className="
+mt-3
+text-gray-600
+dark:text-gray-300
+">
+
+
+<p>{order.shippingAddress.name}</p>
+
+<p>{order.shippingAddress.street}</p>
+
+<p>{order.shippingAddress.city}</p>
+
+<p>{order.shippingAddress.zip}</p>
+
+
+
+{
+order.shippingAddress.phone &&
+
+<p>
+{order.shippingAddress.phone}
+</p>
+
+}
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* CANCEL BUTTON */}
+
+
+
+{
+
+canCancel &&
+
+
+<div className="mt-10">
+
+
+<button
+
+onClick={()=>setShowCancelModal(true)}
+
+className="
+flex
+items-center
+gap-2
+bg-red-600
+hover:bg-red-700
+text-white
+px-5
+py-3
+rounded-xl
+"
+
+>
+
+
+<FiXCircle/>
+
+Cancel Order
+
+
+</button>
+
+
+</div>
+
+
+}
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* MODAL */}
+
+
+<CancelOrderModal
+
+isOpen={showCancelModal}
+
+onClose={()=>setShowCancelModal(false)}
+
+onConfirm={handleCancel}
+
+loading={isCancelling}
+
+/>
+
+
+
+
+
+
+</div>
+
+
+);
+
+
+}

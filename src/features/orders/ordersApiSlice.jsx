@@ -1,71 +1,238 @@
 import { apiSlice } from '../../app/apiSlice';
 import { createEntityAdapter } from '@reduxjs/toolkit';
 
-// Create entity adapter for orders
+
+
 const ordersAdapter = createEntityAdapter({
   selectId: (order) => order._id,
-  sortComparer: (a, b) => b.createdAt.localeCompare(a.createdAt),
+  sortComparer: (a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
 });
 
-// Initial state
 const initialState = ordersAdapter.getInitialState();
 
-// Inject endpoints into apiSlice
+
 export const ordersApiSlice = apiSlice.injectEndpoints({
+
   endpoints: (builder) => ({
-    // Fetch all orders (admin)
+
+    // ==========================
+    // ADMIN ALL ORDERS
+    // ==========================
     getOrders: builder.query({
-      query: () => '/orders',
+
+      query: () => "/orders",
+
       transformResponse: (responseData) => {
-        return ordersAdapter.setAll(initialState, responseData);
+        return ordersAdapter.setAll(
+          initialState,
+          responseData
+        );
       },
+
       providesTags: (result) =>
         result?.ids
           ? [
-              ...result.ids.map((id) => ({ type: 'Order', id })),
-              { type: 'Order', id: 'LIST' },
+              ...result.ids.map((id) => ({
+                type: "Order",
+                id,
+              })),
+              {
+                type: "Order",
+                id: "LIST",
+              },
             ]
-          : [{ type: 'Order', id: 'LIST' }],
+          : [
+              {
+                type: "Order",
+                id: "LIST",
+              },
+            ],
     }),
 
-    // Fetch orders of logged-in user
+
+
+    // ==========================
+    // CUSTOMER ORDERS
+    // ==========================
     getMyOrders: builder.query({
-      query: () => '/orders/my',
+
+      query: () => "/orders/my",
+
       transformResponse: (responseData) => {
-        return ordersAdapter.setAll(initialState, responseData);
+
+        return ordersAdapter.setAll(
+          initialState,
+          responseData
+        );
+
       },
+
       providesTags: (result) =>
         result?.ids
           ? [
-              ...result.ids.map((id) => ({ type: 'Order', id })),
-              { type: 'Order', id: 'MY_ORDERS' },
+              ...result.ids.map((id) => ({
+                type: "Order",
+                id,
+              })),
+
+              {
+                type: "Order",
+                id: "MY_ORDERS",
+              },
             ]
-          : [{ type: 'Order', id: 'MY_ORDERS' }],
+          : [
+              {
+                type: "Order",
+                id: "MY_ORDERS",
+              },
+            ],
     }),
 
-    // Fetch single order by ID
-    getOrderById: builder.query({
-      query: (id) => `/orders/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Order', id }],
-    }),
 
-    // Fetch **order status only** (for polling)
-    getOrderStatus: builder.query({
-      query: (id) => `/orders/${id}/status`,
-      providesTags: (result, error, id) => [{ type: 'Order', id }],
-    }),
 
-    // Mutation to update order status
-    updateOrderStatus: builder.mutation({
-      query: ({ id, status }) => ({
-        url: `/orders/${id}/status`,
-        method: 'PATCH',
-        body: { status },
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Order', id }],
-    }),
+    cancelOrder: builder.mutation({
+
+  query: ({id, reason}) => ({
+    url:`/orders/${id}/cancel`,
+    method:"PATCH",
+    body:{
+      reason
+    }
   }),
+
+
+  invalidatesTags:(result,error,{id})=>[
+    {
+      type:"Order",
+      id
+    },
+    {
+      type:"Order",
+      id:"MY_ORDERS"
+    }
+  ]
+
+}),
+
+
+
+    // ==========================
+    // SINGLE ORDER DETAILS
+    // ==========================
+    getOrderById: builder.query({
+
+      query: (id) => `/orders/${id}`,
+
+      // NO transformResponse here
+      // Backend already returns one object
+
+      providesTags: (result, error, id) => [
+        {
+          type: "Order",
+          id,
+        },
+      ],
+
+    }),
+
+
+
+    // ==========================
+    // ORDER STATUS POLLING
+    // ==========================
+    getOrderStatus: builder.query({
+
+      query: (id) => `/orders/${id}/status`,
+
+      providesTags: (result, error, id) => [
+        {
+          type: "Order",
+          id,
+        },
+      ],
+
+    }),
+
+
+    recordCashPayment: builder.mutation({
+  query: (id) => ({
+    url: `/orders/${id}/record-cash-payment`,
+    method: "PATCH",
+  }),
+
+  invalidatesTags: (result, error, id) => [
+    { type: "Order", id },
+    { type: "Order", id: "LIST" },
+  ],
+}),
+
+
+recordMpesaPayment: builder.mutation({
+  query: ({ id, transactionId }) => ({
+    url: `/orders/${id}/record-mpesa-payment`,
+    method: "PATCH",
+    body: {
+      transactionId,
+    },
+  }),
+
+  invalidatesTags: (result, error, { id }) => [
+    { type: "Order", id },
+    { type: "Order", id: "LIST" },
+  ],
+}),
+
+
+
+completeRefund: builder.mutation({
+  query: ({ id, refundChannel, transactionId }) => ({
+    url: `/orders/${id}/complete-refund`,
+    method: "PATCH",
+    body: {
+      refundChannel,
+      transactionId,
+    },
+  }),
+
+  invalidatesTags: (result, error, { id }) => [
+    { type: "Order", id },
+    { type: "Order", id: "LIST" },
+  ],
+}),
+
+    // ==========================
+    // UPDATE ORDER STATUS
+    // ==========================
+    updateOrderStatus: builder.mutation({
+
+      query: ({ id, status }) => ({
+
+        url: `/orders/${id}/status`,
+
+        method: "PATCH",
+
+        body: {
+          status,
+        },
+
+      }),
+
+      invalidatesTags: (result, error, { id }) => [
+        {
+          type: "Order",
+          id,
+        },
+      ],
+
+    }),
+
+
+  }),
+
 });
+
+
 
 export const {
   useGetOrdersQuery,
@@ -73,4 +240,13 @@ export const {
   useGetOrderByIdQuery,
   useGetOrderStatusQuery,
   useUpdateOrderStatusMutation,
+  useCancelOrderMutation,
+  
+    useRecordCashPaymentMutation,
+
+  useRecordMpesaPaymentMutation,
+
+  useCompleteRefundMutation,
+
+
 } = ordersApiSlice;

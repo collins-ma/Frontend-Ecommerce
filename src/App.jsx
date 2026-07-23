@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate,Navigate } from "re
 import { Toaster } from "react-hot-toast";
 import CreateProduct from "./pages/CreateProduct.jsx";
 
-
+import ReturnDetails from "./pages/ReturnDetails.jsx";
 import ProductsList from './pages/ProductsList';
 import Login from './pages/Login.jsx';
 import SignUp from './pages/SignUp.jsx';
@@ -30,6 +30,10 @@ import SettingsLayout from "./pages/SettingsLayout.jsx";
 import ChangePassword from "./pages/ChangePassword.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 import NetworkStatus from "./pages/NetworkStatus.jsx";
+import AdminOrderDetails from "./pages/AdminOrderDetails.jsx";
+import MyReturns from "./pages/MyReturns.jsx";
+import AdminReturnDetails from "./pages/AdminReturnDetails.jsx";
+import AdminReturns from "./pages/AdminReturns.jsx";
 
 function App() {
   const navigate = useNavigate();
@@ -76,9 +80,20 @@ function App() {
               
               
               <Route path="/cart" element={<CartPage />} />
-              <Route path="/my-orders" element={<MyOrders />} />
-               <Route path="/checkout" element={<CheckoutPage/>}/>
-               
+
+<Route path="/my-orders" element={<MyOrders />} />
+
+<Route path="/orders/:id" element={<OrderDetail />} />
+<Route
+  path="/returns/:id"
+  element={<ReturnDetails />}
+/>
+
+<Route path="/checkout" element={<CheckoutPage/>}/>
+<Route
+ path="/my-returns"
+ element={<MyReturns />}
+/>
                <Route path="/change-profile" element={<UpdateUserProfile/>}/>
               <Route path="/settings" element={<SettingsLayout />}>
              
@@ -91,6 +106,11 @@ function App() {
               <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
                 <Route path="/admin/dashboard" element={<AdminDashBoard />} />
                 <Route path="/users" element={<UsersList />} />
+   
+                  <Route
+        path="/admin/orders/:id"
+        element={<AdminOrderDetails />}
+    />
                 <Route path="/users/:userId" element={<UserDetail />} />
                 <Route path="/create-product" element={<CreateProduct/>}/>
               </Route>
@@ -98,7 +118,15 @@ function App() {
               {/* Protected Orders Routes */}
               <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
                 <Route path="/admin/orders" element={<OrdersList />} />
-                <Route path="/orders/:id" element={<OrderDetail />} />
+                <Route
+  path="/admin/returns"
+  element={<AdminReturns />}
+/>
+             <Route
+  path="/admin/returns/:id"
+  element={<AdminReturnDetails />}
+/>
+             
               </Route>
 
             </Route>

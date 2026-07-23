@@ -1,94 +1,401 @@
 import React from "react";
-import useAuth from "../hooks/useAuth";
 import { Link } from "react-router-dom";
+
 import {
   FiShoppingCart,
   FiUsers,
   FiSettings,
   FiPlus,
-} from "react-icons/fi"; 
+  FiClock,
+  FiCheckCircle,
+    FiRefreshCw,
+} from "react-icons/fi";
+
+import useAuth from "../hooks/useAuth";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 
 import { useGetUsersQuery } from "../features/users/usersApiSlice";
 import { useGetOrdersQuery } from "../features/orders/ordersApiSlice";
 
+
 export default function AdminDashboard() {
-  useDocumentTitle('dashboard')
+
+  useDocumentTitle("dashboard");
+
   const { status, username } = useAuth();
 
-  const { data: usersData, isLoading: isUsersLoading } = useGetUsersQuery();
-  const { data: ordersData, isLoading: isOrdersLoading } = useGetOrdersQuery();
 
-  const totalUsers = usersData?.ids?.length || 0;
-  const totalOrders = ordersData?.ids?.length || 0;
+  const {
+    data: usersData,
+    isLoading: loadingUsers,
+  } = useGetUsersQuery();
+
+
+  const {
+    data: ordersData,
+    isLoading: loadingOrders,
+  } = useGetOrdersQuery();
+
+
+
+  const users =
+    usersData?.ids?.length || 0;
+
+
+  const orders =
+    ordersData?.ids?.length || 0;
+
+
+
+  const orderList =
+    ordersData?.entities
+      ? Object.values(ordersData.entities)
+      : [];
+
+
+
+  const pendingOrders =
+    orderList.filter(
+      (order)=> order.orderStatus === "pending"
+    ).length;
+
+
+
+  const completedOrders =
+    orderList.filter(
+      (order)=> order.orderStatus === "delivered"
+    ).length;
+
+
+
+  const cards = [
+
+    {
+      title:"Total Users",
+      value:users,
+      icon:FiUsers,
+      color:"text-blue-600"
+    },
+
+
+    {
+      title:"Total Orders",
+      value:orders,
+      icon:FiShoppingCart,
+      color:"text-green-600"
+    },
+
+
+    {
+      title:"Pending Orders",
+      value:pendingOrders,
+      icon:FiClock,
+      color:"text-yellow-600"
+    },
+
+
+    {
+      title:"Completed Orders",
+      value:completedOrders,
+      icon:FiCheckCircle,
+      color:"text-purple-600"
+    }
+
+  ];
+
+
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+    <div
+      className="
+      min-h-screen
+      flex
+      flex-col
+      md:flex-row
+      bg-gray-100
+      dark:bg-gray-900
+      text-gray-900
+      dark:text-gray-100
+      "
+    >
+
+
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col md:min-h-screen">
-        <nav className="flex flex-col gap-4 text-gray-700 dark:text-gray-300">
-          <Link className="flex items-center gap-3 hover:text-black dark:hover:text-white" to="/admin/orders">
-            <FiShoppingCart /> Orders
-          </Link>
-        
-          <Link className="flex items-center gap-3 hover:text-black dark:hover:text-white" to="/users">
-            <FiUsers /> Customers
-          </Link>
-         
-          <Link className="flex items-center gap-3 hover:text-black dark:hover:text-white" to="/settings">
-            <FiSettings /> Settings
+
+      <aside
+        className="
+        w-full
+        md:w-64
+        bg-white
+        dark:bg-gray-800
+        shadow-lg
+        p-6
+        "
+      >
+
+        <h2
+          className="
+          text-xl
+          font-bold
+          mb-6
+          "
+        >
+          Admin Panel
+        </h2>
+
+
+
+        <nav
+          className="
+          flex
+          flex-col
+          gap-5
+          "
+        >
+
+
+          <Link
+            to="/admin/orders"
+            className="
+            hover:text-blue-600
+            "
+          >
+            Orders
           </Link>
 
-          
-          <Link className="flex items-center gap-3  text-black dark:hover:text-white mt-4 font-semibold text-green-600" to="/create-product">
-            <FiPlus /> Add Product
+          <Link
+  to="/admin/returns"
+  className="
+    flex
+    items-center
+    gap-2
+    hover:text-blue-600
+  "
+>
+  <FiRefreshCw />
+  Returns
+</Link>
+
+
+
+          <Link
+            to="/users"
+            className="
+            flex
+            items-center
+            gap-2
+            hover:text-blue-600
+            "
+          >
+            <FiUsers/>
+            Customers
           </Link>
 
-          <p className="mt-4 text-green-600 font-semibold">Status: {status}</p>
+
+
+          <Link
+            to="/settings"
+            className="
+            flex
+            items-center
+            gap-2
+            hover:text-blue-600
+            "
+          >
+            <FiSettings/>
+            Settings
+          </Link>
+
+
+
+          <Link
+            to="/create-product"
+            className="
+            flex
+            items-center
+            gap-2
+            text-green-600
+            font-semibold
+            "
+          >
+            <FiPlus/>
+            Add Product
+          </Link>
+
+
+
+          <p
+            className="
+            mt-5
+            text-sm
+            text-green-600
+            font-semibold
+            "
+          >
+            Status: {status}
+          </p>
+
+
         </nav>
+
+
       </aside>
 
-      
-      <main className="flex-1 flex flex-col items-center justify-center gap-6 p-4">
-        
-        <div className="text-center mb-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
+
+
+
+
+
+      {/* Main Content */}
+
+
+      <main
+        className="
+        flex-1
+        p-6
+        "
+      >
+
+
+        <div
+          className="
+          mb-8
+          "
+        >
+
+          <h1
+            className="
+            text-3xl
+            font-bold
+            "
+          >
             Hi, {username} 👋
           </h1>
-          <p className="text-gray-500 dark:text-gray-300 mt-1 text-sm sm:text-base">
+
+
+          <p
+            className="
+            text-gray-500
+            dark:text-gray-400
+            mt-2
+            "
+          >
             Welcome back to your dashboard
           </p>
+
+
         </div>
 
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-3xl">
-          
-          <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow flex items-center justify-between transition transform hover:-translate-y-1 hover:shadow-xl">
-            <div>
-              <p className="text-gray-500 dark:text-gray-300 font-medium text-sm sm:text-base">Total Users</p>
-              {isUsersLoading ? (
-                <p className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 animate-pulse">Loading...</p>
-              ) : (
-                <p className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100">{totalUsers}</p>
-              )}
-            </div>
-            <FiUsers className="text-3xl sm:text-4xl text-blue-500" />
-          </div>
 
-          
-          <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow flex items-center justify-between transition transform hover:-translate-y-1 hover:shadow-xl">
-            <div>
-              <p className="text-gray-500 dark:text-gray-300 font-medium text-sm sm:text-base">Total Orders</p>
-              {isOrdersLoading ? (
-                <p className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 animate-pulse">Loading...</p>
-              ) : (
-                <p className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100">{totalOrders}</p>
-              )}
-            </div>
-            <FiShoppingCart className="text-3xl sm:text-4xl text-green-500" />
-          </div>
+
+
+
+
+        {/* Cards */}
+
+
+        <div
+          className="
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-4
+          gap-6
+          "
+        >
+
+
+          {
+            cards.map((card)=>{
+
+
+              const Icon =
+                card.icon;
+
+
+              return (
+
+                <div
+                  key={card.title}
+                  className="
+                  bg-white
+                  dark:bg-gray-800
+                  rounded-2xl
+                  shadow
+                  p-6
+                  flex
+                  items-center
+                  justify-between
+                  hover:shadow-xl
+                  transition
+                  "
+                >
+
+
+                  <div>
+
+                    <p
+                      className="
+                      text-gray-500
+                      dark:text-gray-400
+                      "
+                    >
+                      {card.title}
+                    </p>
+
+
+                    <h2
+                      className="
+                      text-3xl
+                      font-bold
+                      mt-2
+                      "
+                    >
+
+                      {
+                        loadingUsers || loadingOrders
+                        ?
+                        "..."
+                        :
+                        card.value
+                      }
+
+
+                    </h2>
+
+
+                  </div>
+
+
+
+                  <Icon
+                    className={`
+                    text-4xl
+                    ${card.color}
+                    `}
+                  />
+
+
+                </div>
+
+              );
+
+
+            })
+          }
+
+
         </div>
+
+
+
+
       </main>
+
+
     </div>
+
   );
+
 }
