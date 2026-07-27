@@ -34,7 +34,7 @@ import AdminOrderDetails from "./pages/AdminOrderDetails.jsx";
 import MyReturns from "./pages/MyReturns.jsx";
 import AdminReturnDetails from "./pages/AdminReturnDetails.jsx";
 import AdminReturns from "./pages/AdminReturns.jsx";
-
+import Wishlist from "./pages/Wishlist.jsx"
 function App() {
   const navigate = useNavigate();
 
@@ -82,6 +82,7 @@ function App() {
               <Route path="/cart" element={<CartPage />} />
 
 <Route path="/my-orders" element={<MyOrders />} />
+<Route path="/wishlist" element={<Wishlist />} />
 
 <Route path="/orders/:id" element={<OrderDetail />} />
 <Route

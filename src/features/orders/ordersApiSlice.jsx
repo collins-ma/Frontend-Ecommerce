@@ -138,6 +138,18 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
 
 
 
+    getTodaySales: builder.query({
+      query: () => "/analytics/today-sales",
+      providesTags: ["Analytics"],
+    }),
+
+
+
+    getWeeklySales: builder.query({
+      query: () => "/analytics/weekly-sales",
+      providesTags: ["Analytics"],
+    }),
+
     // ==========================
     // ORDER STATUS POLLING
     // ==========================
@@ -243,7 +255,8 @@ export const {
   useCancelOrderMutation,
   
     useRecordCashPaymentMutation,
-
+useGetTodaySalesQuery,
+useGetWeeklySalesQuery,
   useRecordMpesaPaymentMutation,
 
   useCompleteRefundMutation,

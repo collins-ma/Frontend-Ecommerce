@@ -9,8 +9,8 @@ import {
 } from "react-icons/fi";
 import { useState } from "react";
 
-import RequestReturnModal from "../components/RequestReturnModal";
-import { useReceiveReturnedItemMutation ,useRequestReturnMutation} from "../features/returns/returnsApiSlice";
+import RequestReturnModal from "./RequestReturnModal";
+import { useRequestReturnMutation} from "../features/returns/returnsApiSlice";
 
 export default function OrderCard({ order }) {
 
@@ -89,18 +89,25 @@ export default function OrderCard({ order }) {
 
 
 
-
-const handleRequestReturn = async (data) => {
+const handleRequestReturn = async (returnedItems) => {
+    console.log("Sending to API:", returnedItems);
   try {
     await requestReturn({
       orderId: _id,
-      reason: data.reason,
+      returnedItems,
     }).unwrap();
+
+    alert("Return request submitted successfully.");
 
     setShowReturnModal(false);
 
   } catch (err) {
     console.error(err);
+
+    alert(
+      err?.data?.message ||
+      "Failed to submit return request."
+    );
   }
 };
 
@@ -617,13 +624,14 @@ const handleRequestReturn = async (data) => {
 }
 
 
-
 <RequestReturnModal
   isOpen={showReturnModal}
+  order={order}
   loading={isLoading}
   onClose={() => setShowReturnModal(false)}
   onConfirm={handleRequestReturn}
 />
+
 
     </div>
 

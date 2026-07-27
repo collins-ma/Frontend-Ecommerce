@@ -10,6 +10,7 @@ import useDocumentTitle from "../hooks/useDocumentTitle";
 import { Search,X ,LoaderCircle,Plus,Minus,ShoppingCart,Heart} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductSkeleton from "../app/skeletons/ProductsSkeleton";
+import { useAddToWishlistMutation,useRemoveFromWishlistMutation ,useGetMyWishlistQuery} from "../features/wishlist/wishlistApiSlice";
 
 const ProductsList = () => {
   useDocumentTitle("products");
@@ -30,10 +31,22 @@ const ProductsList = () => {
 
   const { data: categories } = useGetCategoriesQuery();
   const [addToCart] = useAddToCartMutation();
+  const [
+addToWishlist
+]=useAddToWishlistMutation();
+
+
+const [
+removeFromWishlist
+]=useRemoveFromWishlistMutation();
+
+const { data: wishlistData } = useGetMyWishlistQuery(undefined,{
+  skip: !token,
+});
 
   const [quantities, setQuantities] = useState({});
   const [addingItemId, setAddingItemId] = useState(null);
-  const [wishlist, setWishlist] = useState({});
+  
   const [showLoginModal, setShowLoginModal] = useState(false);
 
 
@@ -110,12 +123,48 @@ const decreaseQuantity = (productId) => {
 };
 
 
-const toggleWishlist = (productId) => {
-  setWishlist((prev) => ({
-    ...prev,
-    [productId]: !prev[productId],
-  }));
+const toggleWishlist = async(productId)=>{
+
+
+if(!token){
+ setShowLoginModal(true);
+ return;
+}
+
+
+try{
+
+
+const exists =
+wishlistData?.ids?.includes(productId);
+
+
+
+if(exists){
+
+ await removeFromWishlist(productId).unwrap();
+
+
+}else{
+
+
+ await addToWishlist(productId).unwrap();
+
+
+}
+
+
+
+}catch(error){
+
+console.log(error);
+
+}
+
+
+
 };
+
 
   const handleAddToCart = async (productId) => {
 
@@ -660,12 +709,26 @@ min-h-[640px]
     "
   >
     <Heart
-      className={`w-5 h-5 ${
-        wishlist[product._id]
-          ? "fill-red-500 text-red-500"
-          : "text-gray-500"
-      }`}
-    />
+
+className={`
+w-5 h-5
+
+${
+wishlistData?.ids.includes(product._id)
+
+?
+
+"fill-red-500 text-red-500"
+
+:
+
+"text-gray-500"
+
+}
+
+`}
+
+/>
   </button>
 
 </div>

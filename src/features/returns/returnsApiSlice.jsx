@@ -25,37 +25,29 @@ export const returnsApiSlice = apiSlice.injectEndpoints({
     // CUSTOMER REQUEST RETURN
     // ==========================
 
-    requestReturn: builder.mutation({
-
-      query: ({ orderId, reason }) => ({
-
-        url: `/returns/orders/${orderId}/request`,
-
-        method: "POST",
-
-        body: {
-          reason,
-        },
-
-      }),
-
-      invalidatesTags: [
-        {
-          type: "Return",
-          id: "MY_RETURNS",
-        },
-
-        {
-          type: "Order",
-          id: "MY_ORDERS",
-        },
-      ],
-
-    }),
 
 
 
+requestReturn: builder.mutation({
 
+  query: ({ orderId, returnedItems }) => ({
+
+    url: `/returns/orders/${orderId}/request`,
+
+    method: "POST",
+
+    body: {
+      returnedItems,
+    },
+
+  }),
+
+  invalidatesTags: [
+    { type: "Return", id: "MY_RETURNS" },
+    { type: "Order", id: "MY_ORDERS" },
+  ],
+
+}),
 
     // ==========================
     // CUSTOMER RETURNS
