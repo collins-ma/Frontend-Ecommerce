@@ -1,15 +1,36 @@
+
 import { useState } from 'react';
 import React from 'react';
 import { useCreateProductMutation } from '../features/products/productsApiSlice';
 import { useGetCategoriesQuery } from '../features/categories/categoriesApiSlice';
 import useDocumentTitle from '../hooks/useDocumentTitle';
+import { useGetSuppliersQuery } from "../features/suppliersApiSlice";
 const CreateProduct = () => {
   useDocumentTitle('createProduct')
   const [createProduct] = useCreateProductMutation();
   const { data: categoriesData, isLoading: isCatLoading } = useGetCategoriesQuery();
+  
+  const {
+  data: suppliersData,
+  isLoading: isSuppliersLoading,
+} = useGetSuppliersQuery();
+
+
+
+const suppliers =
+  suppliersData
+    ? suppliersData.ids.map(
+        (id) => suppliersData.entities[id]
+      )
+    : [];
+
+
 
   // Convert entity adapter object to array
   const categories = categoriesData ? categoriesData.ids.map((id) => categoriesData.entities[id]) : [];
+  const [supplier, setSupplier] = useState("");
+
+
 
   const [name, setName] = useState('');
   const [priceKsh, setPriceKsh] = useState('');
@@ -36,6 +57,8 @@ const CreateProduct = () => {
     formData.append('priceKsh', priceKsh); // ✅ KSH only
     formData.append('category', category);
     formData.append('image', image);
+    formData.append("supplier", supplier);
+
 
     try {
       setIsSubmitting(true);
@@ -44,6 +67,7 @@ const CreateProduct = () => {
       // Reset form
       setName('');
       setPriceKsh('');
+      setSupplier("");
       setCategory('');
       setImage(null);
     } catch (err) {
@@ -113,6 +137,50 @@ const CreateProduct = () => {
             </select>
           )}
         </label>
+
+        {/* Supplier */}
+<label className="flex flex-col">
+  <span className="mb-1 text-gray-700 dark:text-gray-200">
+    Supplier
+  </span>
+
+  {isSuppliersLoading ? (
+    <p className="text-gray-500 dark:text-gray-400">
+      Loading suppliers...
+    </p>
+  ) : (
+    <select
+      value={supplier}
+      onChange={(e) => setSupplier(e.target.value)}
+      required
+      className="
+      border
+      rounded-lg
+      px-3
+      py-2
+      focus:outline-none
+      focus:ring-2
+      focus:ring-blue-500
+      dark:bg-gray-700
+      dark:border-gray-600
+      dark:text-gray-200
+      "
+    >
+      <option value="">
+        Select Supplier
+      </option>
+
+      {suppliers.map((sup) => (
+        <option
+          key={sup._id}
+          value={sup._id}
+        >
+          {sup.companyName}
+        </option>
+      ))}
+    </select>
+  )}
+</label>
 
         {/* Image */}
         <label className="flex flex-col">

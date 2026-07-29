@@ -35,6 +35,11 @@ import MyReturns from "./pages/MyReturns.jsx";
 import AdminReturnDetails from "./pages/AdminReturnDetails.jsx";
 import AdminReturns from "./pages/AdminReturns.jsx";
 import Wishlist from "./pages/Wishlist.jsx"
+import SuppliersPage from "./pages/SuppliersPage.jsx"
+import CreateEditSupplier from "./pages/CreateEditSupplier.jsx";
+import PurchaseDetails from "./pages/PurchaseDetails.jsx";
+import PurchasesPage from "./pages/PurchasesPage.jsx";
+import CreatePurchase from "./pages/CreatePurchase.jsx";
 function App() {
   const navigate = useNavigate();
 
@@ -105,8 +110,31 @@ function App() {
 
               {/* Protected Admin Routes */}
               <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-                <Route path="/admin/dashboard" element={<AdminDashBoard />} />
+                <Route path="/admin/dashboard" element={<AdminDashBoard />} /><Route
+  path="purchases"
+  element={<PurchasesPage />}
+/>
+
+<Route
+  path="purchases/new"
+  element={<CreatePurchase />}
+/>
+
+<Route
+  path="purchases/:id"
+  element={<PurchaseDetails />}
+/>
+
                 <Route path="/users" element={<UsersList />} />
+                <Route
+  path="/admin/suppliers/:id/edit"
+  element={<CreateEditSupplier />}
+/>
+                   <Route path="/suppliers" element={<SuppliersPage />} /><Route
+  path="/admin/suppliers/new"
+  element={<CreateEditSupplier />}
+/>
+
    
                   <Route
         path="/admin/orders/:id"

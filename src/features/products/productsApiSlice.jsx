@@ -25,6 +25,38 @@ export const productsApiSlice = apiSlice.injectEndpoints({
           : [{ type: 'Product', id: 'LIST' }],
     }),
 
+
+      getProductsAdmin: builder.query({
+      query: () => '/products/admin',
+
+      transformResponse: (responseData) => {
+        return productsAdapter.setAll(
+          initialState,
+          responseData,
+        );
+      },
+
+      providesTags: (result) =>
+        result?.ids
+          ? [
+              ...result.ids.map((id) => ({
+                type: 'Product',
+                id,
+              })),
+              {
+                type: 'Product',
+                id: 'LIST',
+              },
+            ]
+          : [
+              {
+                type: 'Product',
+                id: 'LIST',
+              },
+            ],
+             }),
+          
+
     // ✅ Create product
     createProduct: builder.mutation({
       query: (formData) => ({
@@ -37,4 +69,4 @@ export const productsApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetProductsQuery, useCreateProductMutation } = productsApiSlice;
+export const { useGetProductsQuery, useCreateProductMutation,  useGetProductsAdminQuery, } = productsApiSlice;
