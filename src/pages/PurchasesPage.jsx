@@ -66,7 +66,7 @@ const PurchasesPage = () => {
         </h1>
 
         <Link
-          to="/admin/purchases/new"
+          to="/purchases/new"
           className="
           bg-blue-600
           hover:bg-blue-700

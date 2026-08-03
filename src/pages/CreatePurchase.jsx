@@ -36,12 +36,38 @@ const CreatePurchase = () => {
     ],
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    // We'll complete this later
-    console.log(purchase);
-  };
+  try {
+
+    await createPurchase(purchase).unwrap();
+
+    alert("Purchase created successfully.");
+
+    setPurchase({
+      supplier: "",
+      notes: "",
+      items: [
+        {
+          product: "",
+          quantity: 1,
+          unitCost: 0,
+        },
+      ],
+    });
+
+  } catch (err) {
+
+    alert(
+      err?.data?.message ||
+      "Failed to create purchase."
+    );
+
+  }
+};
+
+
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -148,28 +174,317 @@ const CreatePurchase = () => {
 
         </div>
 
-        {/* Products Placeholder */}
+{/* Products */}
 
-        <div
-          className="
-          border
-          rounded-xl
-          p-6
-          bg-gray-50
-          dark:bg-gray-700
-          "
-        >
+<div
+  className="
+    border
+    rounded-xl
+    p-6
+    bg-gray-50
+    dark:bg-gray-700
+  "
+>
 
-          <h2 className="text-xl font-semibold mb-3">
-            Products
-          </h2>
+  <div
+    className="
+      flex
+      justify-between
+      items-center
+      mb-6
+    "
+  >
 
-          <p className="text-gray-500">
-            Product selection will be added in the next step.
-          </p>
+    <h2 className="text-xl font-semibold">
+      Products
+    </h2>
+
+    <button
+      type="button"
+      onClick={() =>
+        setPurchase((prev) => ({
+          ...prev,
+          items: [
+            ...prev.items,
+            {
+              product: "",
+              quantity: 1,
+              unitCost: 0,
+            },
+          ],
+        }))
+      }
+      className="
+        bg-green-600
+        hover:bg-green-700
+        text-white
+        px-4
+        py-2
+        rounded-lg
+      "
+    >
+      + Add Product
+    </button>
+
+  </div>
+
+  {
+
+    purchase.items.map((item, index) => (
+
+      <div
+        key={index}
+        className="
+          grid
+          grid-cols-12
+          gap-4
+          items-end
+          mb-4
+        "
+      >
+
+        {/* Product */}
+
+        <div className="col-span-5">
+
+          <label className="block mb-2">
+
+            Product
+
+          </label>
+
+          {
+
+            isProductLoading
+
+            ?
+
+            <p>Loading...</p>
+
+            :
+
+            <select
+
+              value={item.product}
+
+              onChange={(e) => {
+
+                const newItems = [...purchase.items];
+
+                newItems[index].product =
+                  e.target.value;
+
+                setPurchase({
+
+                  ...purchase,
+
+                  items: newItems,
+
+                });
+
+              }}
+
+              className="
+                w-full
+                border
+                rounded-lg
+                px-3
+                py-2
+              "
+            >
+
+              <option value="">
+
+                Select Product
+
+              </option>
+
+              {
+
+                products?.ids.map((id) => {
+
+                  const product =
+                    products.entities[id];
+
+                  return (
+
+                    <option
+                      key={product._id}
+                      value={product._id}
+                    >
+
+                      {product.name}
+
+                    </option>
+
+                  );
+
+                })
+
+              }
+
+            </select>
+
+          }
 
         </div>
 
+        {/* Quantity */}
+
+        <div className="col-span-2">
+
+          <label className="block mb-2">
+
+            Qty
+
+          </label>
+
+          <input
+
+            type="number"
+
+            min="1"
+
+            value={item.quantity}
+
+            onChange={(e) => {
+
+              const newItems = [...purchase.items];
+
+              newItems[index].quantity =
+                Number(e.target.value);
+
+              setPurchase({
+
+                ...purchase,
+
+                items: newItems,
+
+              });
+
+            }}
+
+            className="
+              w-full
+              border
+              rounded-lg
+              px-3
+              py-2
+            "
+
+          />
+
+        </div>
+
+        {/* Unit Cost */}
+
+        <div className="col-span-3">
+
+          <label className="block mb-2">
+
+            Unit Cost
+
+          </label>
+
+          <input
+
+            type="number"
+
+            min="0"
+
+            value={item.unitCost}
+
+            onChange={(e) => {
+
+              const newItems = [...purchase.items];
+
+              newItems[index].unitCost =
+                Number(e.target.value);
+
+              setPurchase({
+
+                ...purchase,
+
+                items: newItems,
+
+              });
+
+            }}
+
+            className="
+              w-full
+              border
+              rounded-lg
+              px-3
+              py-2
+            "
+
+          />
+
+        </div>
+
+        {/* Remove */}
+
+        <div className="col-span-2">
+
+          {
+
+            purchase.items.length > 1 && (
+
+              <button
+
+                type="button"
+
+                onClick={() => {
+
+                  const newItems =
+                    purchase.items.filter(
+
+                      (_, i) => i !== index
+
+                    );
+
+                  setPurchase({
+
+                    ...purchase,
+
+                    items: newItems,
+
+                  });
+
+                }}
+
+                className="
+                  bg-red-600
+                  hover:bg-red-700
+                  text-white
+                  px-4
+                  py-2
+                  rounded-lg
+                "
+
+              >
+
+                Remove
+
+              </button>
+
+            )
+
+          }
+
+        </div>
+
+      </div>
+
+    ))
+
+  }
+
+</div>
+
+
+      
         <button
           type="submit"
           disabled={isLoading}
