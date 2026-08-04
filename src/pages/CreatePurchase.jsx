@@ -17,6 +17,9 @@ const CreatePurchase = () => {
     isLoading: isProductLoading,
   } = useGetProductsAdminQuery();
 
+
+
+
   const [
     createPurchase,
     {
