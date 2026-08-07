@@ -10,7 +10,7 @@ import {
   useGetNotificationsQuery,
 } from "../features/notifications/notificationsApiSlice";
 
-import NotificationDropdown from "./NotificationDropDown";
+import NotificationDropdown from "./NotificationDropdown";
 
 const NotificationsBell = () => {
   const [open, setOpen] = useState(false);
