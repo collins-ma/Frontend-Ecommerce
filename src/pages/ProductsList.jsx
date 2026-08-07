@@ -56,47 +56,32 @@ const { data: wishlistData } = useGetMyWishlistQuery(undefined,{
   const [messageType, setMessageType] = useState("");
   const [activeBanner, setActiveBanner] = useState(0);
 
-  const banners = [
-  {
-    title: "🔥 Big Electronics Sale",
-    description: "Up to 30% OFF Smartphones, Laptops & Accessories",
-    button: "Shop Now",
-    image: "/banners/iphone.jpg",
-  },
+const allProducts =
+  products?.ids.map((id) => products.entities[id]) || [];
 
-  {
-    title: "🚚 Free Delivery",
-    description: "For orders above KSh 5,000",
-    button: "Shop Now",
-    image: "/banners/delivery.jpg",
-  },
+const banners = allProducts.slice(0, 3).map((product) => ({
+  title: product.name,
+  description:
+    product.description || "Available now at the best price.",
+  button: "Shop Now",
+  image: product.image,
+}));
 
-  {
-    title: "🆕 New Arrivals",
-    description: "Gaming laptops and wireless earbuds available now",
-    button: "Explore",
-    image: "/banners/gaming-laptop.jpg",
-  },
-  ]
-
-
-  useEffect(() => {
+useEffect(() => {
+  if (banners.length === 0) return;
 
   const timer = setInterval(() => {
-
     setActiveBanner((current) =>
       current === banners.length - 1
         ? 0
         : current + 1
     );
-
   }, 4000);
 
-
   return () => clearInterval(timer);
+}, [banners.length]);
 
-}, []);
-  
+
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
@@ -229,8 +214,8 @@ setMessage(
       </p>
     );
 
-const allProducts =
-  products?.ids.map((id) => products.entities[id]) || [];
+// const allProducts =
+//   products?.ids.map((id) => products.entities[id]) || [];
 
 const filteredProducts = allProducts.filter((product) => {
   const keyword = search.toLowerCase().trim();
@@ -457,99 +442,93 @@ transition={{
       </div>
 
 
-<motion.div
-  key={activeBanner}
-  initial={{ opacity: 0, x: 30 }}
-  animate={{ opacity: 1, x: 0 }}
-  transition={{ duration: 0.4 }}
+{banners.length > 0 && (
+  <motion.div
+    key={activeBanner}
+    initial={{ opacity: 0, x: 30 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.4 }}
+    className="
+      max-w-7xl
+      mx-auto
+      w-full
+      px-4
+      mt-4
+    "
+  >
+    <div
+      className="
+        rounded-2xl
+        overflow-hidden
+        bg-white
+        dark:bg-gray-800
+        shadow-md
+        grid
+        grid-cols-2
+        items-center
+        h-32
+      "
+    >
+      <div className="p-3 sm:p-4 flex flex-col flex-1">
+        <h2
+          className="
+            text-sm
+            md:text-lg
+            font-bold
+            text-gray-800
+            dark:text-white
+          "
+        >
+          {banners[activeBanner].title}
+        </h2>
+
+        <p
+          className="
+            mt-1
+            text-xs
+            md:text-sm
+            text-gray-600
+            dark:text-gray-300
+            line-clamp-2
+          "
+        >
+          {banners[activeBanner].description}
+        </p>
+
+        <button
+          className="
+            mt-2
+            bg-green-600
+            text-white
+            px-3
+            py-1
+            text-xs
+            rounded-lg
+            font-semibold
+            hover:bg-green-700
+            transition
+          "
+        >
+          {banners[activeBanner].button}
+        </button>
+      </div>
+
+     <img
+  src={banners[activeBanner].image}
+  alt={banners[activeBanner].title}
   className="
-    max-w-7xl
+    max-w-[180px]
+    max-h-[110px]
+    object-contain
     mx-auto
-    w-full
-    px-4
-    mt-4
+    transition-transform
+    duration-500
   "
->
-
-<div
-className="
-rounded-2xl
-overflow-hidden
-bg-white
-dark:bg-gray-800
-shadow-md
-grid
-grid-cols-2
-items-center
-h-32
-"
->
-<div className="p-3 sm:p-4 flex flex-col flex-1">
-
-
-<h2
-className="
-text-sm
-md:text-lg
-font-bold
-text-gray-800
-dark:text-white
-"
->
-{banners[activeBanner].title}
-</h2>
-
-
-<p
-className="
-mt-1
-text-xs
-md:text-sm
-text-gray-600
-dark:text-gray-300
-line-clamp-2
-"
->
-{banners[activeBanner].description}
-</p>
-
-
-<button
-className="
-mt-2
-bg-green-600
-text-white
-px-3
-py-1
-text-xs
-rounded-lg
-font-semibold
-hover:bg-green-700
-transition
-"
->
-{banners[activeBanner].button}
-</button>
-
-
-</div>
-
-
-<img
-src={banners[activeBanner].image}
-alt={banners[activeBanner].title}
-className="
-w-full
-h-32
-object-cover
-"
 />
-
-
-</div>
-
-</motion.div>
-
+      
+    </div>
+  </motion.div>
+)}
 
       {/* Welcome */}
           <motion.div
@@ -763,9 +742,21 @@ min-h-[56px]
               }).format(product.priceKsh)}
             </p>
 
-            <p className="mt-1 text-sm text-green-600 font-medium">
-              In Stock
-            </p>
+           <p
+  className={`mt-1 text-sm font-medium ${
+    product.stock === 0
+      ? "text-red-600"
+      : product.stock < 10
+      ? "text-orange-600"
+      : "text-green-600"
+  }`}
+>
+  {product.stock === 0
+    ? "Out of Stock"
+    : product.stock < 10
+    ? `${product.stock} unit${product.stock === 1 ? "" : "s"} remaining`
+    : "In Stock"}
+</p>
 
             <div className="mt-4 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -821,34 +812,47 @@ shadow-sm
                 </button>
               </div>
             </div>
+<button
+  onClick={() => handleAddToCart(product._id)}
+  disabled={isAdding || product.stock === 0}
+  className={`
+    mt-auto
+    w-full
+    py-2
+    sm:py-2.5
+    text-xs
+    sm:text-sm
+    rounded-xl
+    font-semibold
+    transition-all
+    duration-300
+    flex
+    items-center
+    justify-center
+    gap-2
 
-            <button
-              onClick={() => handleAddToCart(product._id)}
-              disabled={isAdding}
-             className="mt-auto w-full bg-gradient-to-r from-green-600 to-green-700
-text-white
-py-2
-sm:py-2.5
-text-xs sm:text-sm
-rounded-xl
-font-semibold
-hover:from-green-700 hover:to-green-800
-transition-all duration-300
-hover:scale-[1.02]
-active:scale-95
-shadow-lg hover:shadow-xl
-flex items-center justify-center gap-2">
-              {isAdding ? (
-                <LoaderCircle className="w-5 h-5 animate-spin" />
-              ) : (
-
-                  <>
-             <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+    ${
+      product.stock === 0
+        ? "bg-gray-400 cursor-not-allowed text-white"
+        : "bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl"
+    }
+  `}
+>
+  {isAdding ? (
+    <LoaderCircle className="w-5 h-5 animate-spin" />
+  ) : product.stock === 0 ? (
+    <>
+      <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+      <span>Out of Stock</span>
+    </>
+  ) : (
+    <>
+      <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
       <span>Add to Cart</span>
-          </>
-          
-              )}
-            </button>
+    </>
+  )}
+</button>
+           
           </div>
         </motion.div>
       );

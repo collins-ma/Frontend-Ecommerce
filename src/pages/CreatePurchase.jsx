@@ -17,14 +17,9 @@ const CreatePurchase = () => {
     isLoading: isProductLoading,
   } = useGetProductsAdminQuery();
 
-
-
-
   const [
     createPurchase,
-    {
-      isLoading,
-    },
+    { isLoading },
   ] = useCreatePurchaseMutation();
 
   const [purchase, setPurchase] = useState({
@@ -35,45 +30,45 @@ const CreatePurchase = () => {
         product: "",
         quantity: 1,
         unitCost: 0,
+        expiryDate: "",
       },
     ],
   });
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-
-    await createPurchase(purchase).unwrap();
-
-    alert("Purchase created successfully.");
-
-    setPurchase({
-      supplier: "",
-      notes: "",
-      items: [
-        {
-          product: "",
-          quantity: 1,
-          unitCost: 0,
-        },
-      ],
-    });
-
-  } catch (err) {
-
-    alert(
-      err?.data?.message ||
-      "Failed to create purchase."
-    );
-
-  }
-};
+console.log(products?.entities);
 
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await createPurchase(purchase).unwrap();
+
+      alert("Purchase created successfully.");
+
+      setPurchase({
+        supplier: "",
+        notes: "",
+        items: [
+          {
+            product: "",
+            quantity: 1,
+            unitCost: 0,
+            expiryDate: "",
+          },
+        ],
+      });
+
+    } catch (err) {
+      alert(
+        err?.data?.message ||
+          "Failed to create purchase."
+      );
+    }
+  };
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto">
 
       <h1 className="text-3xl font-bold mb-8">
         Create Purchase
@@ -82,12 +77,12 @@ const handleSubmit = async (e) => {
       <form
         onSubmit={handleSubmit}
         className="
-        bg-white
-        dark:bg-gray-800
-        rounded-2xl
-        shadow
-        p-6
-        space-y-6
+          bg-white
+          dark:bg-gray-800
+          rounded-2xl
+          shadow
+          p-6
+          space-y-6
         "
       >
 
@@ -106,6 +101,7 @@ const handleSubmit = async (e) => {
           ) : (
 
             <select
+              required
               value={purchase.supplier}
               onChange={(e) =>
                 setPurchase((prev) => ({
@@ -114,11 +110,11 @@ const handleSubmit = async (e) => {
                 }))
               }
               className="
-              w-full
-              border
-              rounded-xl
-              px-4
-              py-3
+                w-full
+                border
+                rounded-xl
+                px-4
+                py-3
               "
             >
 
@@ -157,7 +153,7 @@ const handleSubmit = async (e) => {
           </label>
 
           <textarea
-            rows="4"
+            rows={4}
             value={purchase.notes}
             onChange={(e) =>
               setPurchase((prev) => ({
@@ -166,347 +162,337 @@ const handleSubmit = async (e) => {
               }))
             }
             className="
-            w-full
-            border
-            rounded-xl
-            px-4
-            py-3
+              w-full
+              border
+              rounded-xl
+              px-4
+              py-3
             "
-            placeholder="Purchase notes..."
           />
 
         </div>
 
-{/* Products */}
+        {/* Header */}
 
-<div
-  className="
-    border
-    rounded-xl
-    p-6
-    bg-gray-50
-    dark:bg-gray-700
-  "
->
+        <div className="flex justify-between items-center">
 
-  <div
-    className="
-      flex
-      justify-between
-      items-center
-      mb-6
-    "
-  >
+          <h2 className="text-xl font-semibold">
+            Products
+          </h2>
 
-    <h2 className="text-xl font-semibold">
-      Products
-    </h2>
+          <button
+            type="button"
+            onClick={() =>
+              setPurchase((prev) => ({
+                ...prev,
+                items: [
+                  ...prev.items,
+                  {
+                    product: "",
+                    quantity: 1,
+                    unitCost: 0,
+                    expiryDate: "",
+                  },
+                ],
+              }))
+            }
+            className="
+              bg-green-600
+              hover:bg-green-700
+              text-white
+              px-4
+              py-2
+              rounded-lg
+            "
+          >
+            + Add Product
+          </button>
 
-    <button
-      type="button"
-      onClick={() =>
-        setPurchase((prev) => ({
-          ...prev,
-          items: [
-            ...prev.items,
-            {
-              product: "",
-              quantity: 1,
-              unitCost: 0,
-            },
-          ],
-        }))
-      }
-      className="
-        bg-green-600
-        hover:bg-green-700
-        text-white
-        px-4
-        py-2
-        rounded-lg
-      "
-    >
-      + Add Product
-    </button>
+        </div>
 
-  </div>
+        {purchase.items.map((item, index) => {
 
-  {
+          const selectedProduct =
+            item.product
+              ? products?.entities[item.product]
+              : null;
 
-    purchase.items.map((item, index) => (
+          const requiresExpiry =
+            selectedProduct?.category?.trackExpiry;
 
-      <div
-        key={index}
-        className="
-          grid
-          grid-cols-12
-          gap-4
-          items-end
-          mb-4
-        "
-      >
+          return (
 
-        {/* Product */}
-
-        <div className="col-span-5">
-
-          <label className="block mb-2">
-
-            Product
-
-          </label>
-
-          {
-
-            isProductLoading
-
-            ?
-
-            <p>Loading...</p>
-
-            :
-
-            <select
-
-              value={item.product}
-
-              onChange={(e) => {
-
-                const newItems = [...purchase.items];
-
-                newItems[index].product =
-                  e.target.value;
-
-                setPurchase({
-
-                  ...purchase,
-
-                  items: newItems,
-
-                });
-
-              }}
-
+            <div
+              key={index}
               className="
-                w-full
-                border
-                rounded-lg
-                px-3
-                py-2
+                grid
+                grid-cols-12
+                gap-4
+                items-end
               "
             >
 
-              <option value="">
+              {/* Product */}
 
-                Select Product
+              <div className="col-span-4">
 
-              </option>
+                <label className="block mb-2">
+                  Product
+                </label>
 
-              {
+                {isProductLoading ? (
 
-                products?.ids.map((id) => {
+                  <p>Loading...</p>
 
-                  const product =
-                    products.entities[id];
+                ) : (
 
-                  return (
+                  <select
+                    required
+                    value={item.product}
+                    onChange={(e) => {
 
-                    <option
-                      key={product._id}
-                      value={product._id}
-                    >
+                      const newItems =
+                        [...purchase.items];
 
-                      {product.name}
+                      newItems[index].product =
+                        e.target.value;
 
+                      const product =
+                        products?.entities[
+                          e.target.value
+                        ];
+
+                      if (
+                        !product?.category
+                          ?.trackExpiry
+                      ) {
+                        newItems[index].expiryDate =
+                          "";
+                      }
+
+                      setPurchase({
+                        ...purchase,
+                        items: newItems,
+                      });
+
+                    }}
+                    className="
+                      w-full
+                      border
+                      rounded-lg
+                      px-3
+                      py-2
+                    "
+                  >
+
+                    <option value="">
+                      Select Product
                     </option>
 
-                  );
+                    {products?.ids.map((id) => {
 
-                })
+                      const product =
+                        products.entities[id];
 
-              }
+                      return (
 
-            </select>
+                        <option
+                          key={product._id}
+                          value={product._id}
+                        >
+                          {product.name}
+                        </option>
 
-          }
+                      );
 
-        </div>
+                    })}
 
-        {/* Quantity */}
+                  </select>
 
-        <div className="col-span-2">
+                )}
 
-          <label className="block mb-2">
+              </div>
 
-            Qty
+              {/* Qty */}
 
-          </label>
+              <div className="col-span-2">
 
-          <input
+                <label className="block mb-2">
+                  Qty
+                </label>
 
-            type="number"
+                <input
+                  required
+                  min={1}
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) => {
 
-            min="1"
+                    const newItems =
+                      [...purchase.items];
 
-            value={item.quantity}
+                    newItems[index].quantity =
+                      Number(e.target.value);
 
-            onChange={(e) => {
+                    setPurchase({
+                      ...purchase,
+                      items: newItems,
+                    });
 
-              const newItems = [...purchase.items];
+                  }}
+                  className="
+                    w-full
+                    border
+                    rounded-lg
+                    px-3
+                    py-2
+                  "
+                />
 
-              newItems[index].quantity =
-                Number(e.target.value);
+              </div>
 
-              setPurchase({
+              {/* Cost */}
 
-                ...purchase,
+              <div className="col-span-2">
 
-                items: newItems,
+                <label className="block mb-2">
+                  Unit Cost
+                </label>
 
-              });
+                <input
+                  required
+                  min={0}
+                  type="number"
+                  value={item.unitCost}
+                  onChange={(e) => {
 
-            }}
+                    const newItems =
+                      [...purchase.items];
 
-            className="
-              w-full
-              border
-              rounded-lg
-              px-3
-              py-2
-            "
+                    newItems[index].unitCost =
+                      Number(e.target.value);
 
-          />
+                    setPurchase({
+                      ...purchase,
+                      items: newItems,
+                    });
 
-        </div>
+                  }}
+                  className="
+                    w-full
+                    border
+                    rounded-lg
+                    px-3
+                    py-2
+                  "
+                />
 
-        {/* Unit Cost */}
+              </div>
 
-        <div className="col-span-3">
+              {/* Expiry */}
 
-          <label className="block mb-2">
+              <div className="col-span-2">
 
-            Unit Cost
+                {requiresExpiry && (
 
-          </label>
+                  <>
+                    <label className="block mb-2">
+                      Expiry Date
+                    </label>
 
-          <input
+                    <input
+                      type="date"
+                      required={requiresExpiry}
+                      value={item.expiryDate}
+                      onChange={(e) => {
 
-            type="number"
+                        const newItems =
+                          [...purchase.items];
 
-            min="0"
+                        newItems[index].expiryDate =
+                          e.target.value;
 
-            value={item.unitCost}
+                        setPurchase({
+                          ...purchase,
+                          items: newItems,
+                        });
 
-            onChange={(e) => {
+                      }}
+                      className="
+                        w-full
+                        border
+                        rounded-lg
+                        px-3
+                        py-2
+                      "
+                    />
+                  </>
 
-              const newItems = [...purchase.items];
+                )}
 
-              newItems[index].unitCost =
-                Number(e.target.value);
+              </div>
 
-              setPurchase({
+              {/* Remove */}
 
-                ...purchase,
+              <div className="col-span-2">
 
-                items: newItems,
+                {purchase.items.length > 1 && (
 
-              });
+                  <button
+                    type="button"
+                    onClick={() => {
 
-            }}
+                      const newItems =
+                        purchase.items.filter(
+                          (_, i) =>
+                            i !== index
+                        );
 
-            className="
-              w-full
-              border
-              rounded-lg
-              px-3
-              py-2
-            "
+                      setPurchase({
+                        ...purchase,
+                        items: newItems,
+                      });
 
-          />
+                    }}
+                    className="
+                      bg-red-600
+                      hover:bg-red-700
+                      text-white
+                      px-4
+                      py-2
+                      rounded-lg
+                    "
+                  >
+                    Remove
+                  </button>
 
-        </div>
+                )}
 
-        {/* Remove */}
+              </div>
 
-        <div className="col-span-2">
+            </div>
 
-          {
+          );
 
-            purchase.items.length > 1 && (
+        })}
 
-              <button
-
-                type="button"
-
-                onClick={() => {
-
-                  const newItems =
-                    purchase.items.filter(
-
-                      (_, i) => i !== index
-
-                    );
-
-                  setPurchase({
-
-                    ...purchase,
-
-                    items: newItems,
-
-                  });
-
-                }}
-
-                className="
-                  bg-red-600
-                  hover:bg-red-700
-                  text-white
-                  px-4
-                  py-2
-                  rounded-lg
-                "
-
-              >
-
-                Remove
-
-              </button>
-
-            )
-
-          }
-
-        </div>
-
-      </div>
-
-    ))
-
-  }
-
-</div>
-
-
-      
         <button
           type="submit"
           disabled={isLoading}
           className="
-          bg-blue-600
-          hover:bg-blue-700
-          disabled:bg-gray-400
-          text-white
-          px-6
-          py-3
-          rounded-xl
-          font-semibold
+            bg-blue-600
+            hover:bg-blue-700
+            disabled:bg-gray-400
+            text-white
+            px-6
+            py-3
+            rounded-xl
+            font-semibold
           "
         >
-
           {isLoading
             ? "Saving..."
             : "Create Purchase"}
-
         </button>
 
       </form>

@@ -40,6 +40,7 @@ import CreateEditSupplier from "./pages/CreateEditSupplier.jsx";
 import PurchaseDetails from "./pages/PurchaseDetails.jsx";
 import PurchasesPage from "./pages/PurchasesPage.jsx";
 import CreatePurchase from "./pages/CreatePurchase.jsx";
+import CreateCategory from "./pages/CreateCategory.jsx";
 function App() {
   const navigate = useNavigate();
 
@@ -147,10 +148,17 @@ function App() {
               {/* Protected Orders Routes */}
               <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
                 <Route path="/admin/orders" element={<OrdersList />} />
+
                 <Route
   path="/admin/returns"
   element={<AdminReturns />}
 />
+
+ <Route
+    path="/admin/categories/create"
+    element={<CreateCategory />}
+  />
+ 
              <Route
   path="/admin/returns/:id"
   element={<AdminReturnDetails />}

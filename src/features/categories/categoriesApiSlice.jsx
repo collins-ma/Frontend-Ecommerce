@@ -1,5 +1,5 @@
-import { apiSlice } from '../../app/apiSlice';
-import { createEntityAdapter } from '@reduxjs/toolkit';
+import { apiSlice } from "../../app/apiSlice";
+import { createEntityAdapter } from "@reduxjs/toolkit";
 
 const categoriesAdapter = createEntityAdapter({
   selectId: (category) => category._id,
@@ -10,18 +10,55 @@ const initialState = categoriesAdapter.getInitialState();
 
 export const categoriesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+
     getCategories: builder.query({
-      query: () => '/categories',
-      transformResponse: (responseData) => categoriesAdapter.setAll(initialState, responseData),
+      query: () => "/categories",
+
+      transformResponse: (responseData) =>
+        categoriesAdapter.setAll(
+          initialState,
+          responseData
+        ),
+
       providesTags: (result) =>
         result?.ids
           ? [
-              ...result.ids.map((id) => ({ type: 'Category', id })),
-              { type: 'Category', id: 'LIST' },
+              ...result.ids.map((id) => ({
+                type: "Category",
+                id,
+              })),
+              {
+                type: "Category",
+                id: "LIST",
+              },
             ]
-          : [{ type: 'Category', id: 'LIST' }],
+          : [
+              {
+                type: "Category",
+                id: "LIST",
+              },
+            ],
     }),
+
+    createCategory: builder.mutation({
+      query: (category) => ({
+        url: "/categories",
+        method: "POST",
+        body: category,
+      }),
+
+      invalidatesTags: [
+        {
+          type: "Category",
+          id: "LIST",
+        },
+      ],
+    }),
+
   }),
 });
 
-export const { useGetCategoriesQuery } = categoriesApiSlice;
+export const {
+  useGetCategoriesQuery,
+  useCreateCategoryMutation,
+} = categoriesApiSlice;

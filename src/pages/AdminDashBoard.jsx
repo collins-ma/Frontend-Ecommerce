@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
+import NotificationsBell from "./NotificationsBell";
 import {
   FiShoppingCart,
   FiUsers,
@@ -10,6 +10,8 @@ import {
   FiCheckCircle,
   FiRefreshCw,
   FiDollarSign,
+   FiTruck,
+  FiPackage,
 } from "react-icons/fi";
 
 import useAuth from "../hooks/useAuth";
@@ -179,6 +181,32 @@ export default function AdminDashboard() {
             Add Product
           </Link>
 
+
+          <Link
+  to="/admin/categories/create"
+  className="flex items-center gap-2 hover:text-blue-600"
+>
+  <FiPlus />
+  Create Category
+</Link>
+
+
+
+<Link
+  to="/purchases"
+  className="flex items-center gap-2 hover:text-blue-600"
+>
+  <FiPackage />
+  Purchases
+</Link>
+
+<Link
+  to="/suppliers"
+  className="flex items-center gap-2 hover:text-blue-600"
+>
+  <FiTruck />
+  Suppliers
+</Link>
           <p className="mt-5 text-sm text-green-600 font-semibold">
             Status: {status}
           </p>
@@ -191,18 +219,23 @@ export default function AdminDashboard() {
 
       <main className="flex-1 p-6">
 
-        <div className="mb-8">
+       <div className="mb-8 flex items-start justify-between">
 
-          <h1 className="text-3xl font-bold">
-            Hi, {username} 👋
-          </h1>
+  <div>
 
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Welcome back to your dashboard
-          </p>
+    <h1 className="text-3xl font-bold">
+      Hi, {username} 👋
+    </h1>
 
-        </div>
+    <p className="text-gray-500 dark:text-gray-400 mt-2">
+      Welcome back to your dashboard
+    </p>
 
+  </div>
+
+  <NotificationsBell />
+
+</div>
         {/* Dashboard Cards */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -7,6 +7,8 @@ import {
   FiMenu,
   FiPackage,
   FiShoppingCart,
+   FiHeart,
+  FiRefreshCw,
 } from "react-icons/fi";
 import { useOnSendLogoutMutation } from "../auth/authApiSlice";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -244,6 +246,51 @@ duration-200
   <FiUser className="text-lg text-green-600" />
   Profile
 </button>
+
+<button
+  onClick={() => requireLogin("/wishlist")}
+  className="
+    w-full
+    flex
+    items-center
+    gap-3
+    px-5
+    py-3
+    hover:bg-gray-100
+    dark:hover:bg-gray-700
+    transition-all
+    duration-200
+  "
+>
+  <FiHeart className="text-pink-600" />
+
+  <span>
+    Wishlist
+  </span>
+</button>
+
+<button
+  onClick={() => requireLogin("/my-returns")}
+  className="
+    w-full
+    flex
+    items-center
+    gap-3
+    px-5
+    py-3
+    hover:bg-gray-100
+    dark:hover:bg-gray-700
+    transition-all
+    duration-200
+  "
+>
+  <FiRefreshCw className="text-orange-600" />
+
+  <span>
+    My Returns
+  </span>
+</button>
+
           
         <button
   onClick={() => requireLogin("/settings")}
