@@ -38,7 +38,11 @@ export default function AdminDashboard() {
   const {
     data: ordersData,
     isLoading: loadingOrders,
-  } = useGetOrdersQuery();
+  } = useGetOrdersQuery(undefined, {
+    pollingInterval: 60000,
+    // refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
 
   const {
     data: todaySales,

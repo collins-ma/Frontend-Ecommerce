@@ -454,7 +454,7 @@ font-bold
 text-green-600
 ">
 
-KSh {item.priceksh.toLocaleString()}
+KSh {item.priceksh?.toLocaleString() ?? "0"}
 
 </p>
 

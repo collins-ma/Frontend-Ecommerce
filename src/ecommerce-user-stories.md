@@ -8,8 +8,8 @@
 **So that** I can make purchases and track my orders  
 
 **Acceptance Criteria:**
-- [ ] User can register with username, email and password
-- [ ] Validation for email format and password strength
+- [x] User can register with username, email and password
+- [x] Validation for email format and password strength
 - [ ] Confirmation message after successful signup
 
 **Status:** ❌ Not Started
@@ -22,8 +22,8 @@
 **So that** I can access my account and previous orders  
 
 **Acceptance Criteria:**
-- [ ] User can log in with email and password
-- [ ] Error message for invalid credentials
+- [x] User can log in with email and password
+- [x] Error message for invalid credentials
 - [ ] Optional: “Remember me” functionality
 
 **Status:** ❌ Not Started
@@ -36,8 +36,8 @@
 **So that** my account is secure  
 
 **Acceptance Criteria:**
-- [ ] User can log out from any page
-- [ ] Session is cleared upon logout
+- [x] User can log out from any page
+- [x] Session is cleared upon logout
 
 **Status:** ❌ Not Started
 
@@ -49,8 +49,8 @@
 **So that** my account details are accurate  
 
 **Acceptance Criteria:**
-- [ ] User can edit name, email, and password
-- [ ] Changes are saved and reflected immediately
+- [x] User can edit name, email, and password
+- [x] Changes are saved and reflected immediately
 
 **Status:** ❌ Not Started
 
@@ -64,7 +64,7 @@
 **So that** I can browse items to buy  
 
 **Acceptance Criteria:**
-- [ ] Product list displays image, name, price
+- [x] Product list displays image, name, price
 - [ ] Pagination or infinite scroll
 - [ ] Categories or filters can narrow results
 
@@ -93,8 +93,8 @@
 **So that** I can buy multiple items at once  
 
 **Acceptance Criteria:**
-- [ ] Items are added to cart with quantity and price
-- [ ] Cart icon updates with number of items
+- [x] Items are added to cart with quantity and price
+- [x] Cart icon updates with number of items
 
 **Status:** ❌ Not Started
 
@@ -106,8 +106,8 @@
 **So that** I only purchase what I want  
 
 **Acceptance Criteria:**
-- [ ] User can remove items from cart
-- [ ] Cart total updates immediately
+- [x] User can remove items from cart
+- [x] Cart total updates immediately
 
 **Status:** ❌ Not Started
 
@@ -119,8 +119,8 @@
 **So that** I can complete my purchase  
 
 **Acceptance Criteria:**
-- [ ] User enters shipping info
-- [ ] User selects payment method (credit card, PayPal, etc.)
+- [x] User enters shipping info
+- [x] User selects payment method (credit card, PayPal, etc.)
 - [ ] Confirmation page displays order summary
 
 **Status:** ❌ Not Started
@@ -135,8 +135,8 @@
 **So that** I can track purchases  
 
 **Acceptance Criteria:**
-- [ ] List of orders shows status, total, date
-- [ ] Click to view order details
+- [x] List of orders shows status, total, date
+- [x] Click to view order details
 
 **Status:** ❌ Not Started
 
@@ -148,7 +148,7 @@
 **So that** I know when my items will arrive  
 
 **Acceptance Criteria:**
-- [ ] Shows shipment status (processing, shipped, delivered)
+- [x] Shows shipment status (processing, shipped, delivered)
 - [ ] Optional: Estimated delivery date
 
 **Status:** ❌ Not Started
@@ -163,7 +163,7 @@
 **So that** the store catalog is up-to-date  
 
 **Acceptance Criteria:**
-- [ ] Admin can add new products with name, description, price, and images
+- [x] Admin can add new products with name, description, price, and images
 - [ ] Admin can edit existing products
 - [ ] Admin can delete products
 - [ ] Changes are reflected immediately in the store
@@ -178,8 +178,8 @@
 **So that** customers know the progress of their orders  
 
 **Acceptance Criteria:**
-- [ ] Admin can mark orders as processing, shipped, or delivered
-- [ ] Users see updated status in their order history
+- [x] Admin can mark orders as processing, shipped, or delivered
+- [x] Users see updated status in their order history
 
 **Status:** ❌ Not Started
 
@@ -191,10 +191,10 @@
 **So that** I can manage platform users  
 
 **Acceptance Criteria:**
-- [ ] Admin can view all registered users with details (name, email, role)
-- [ ] Admin can update user information or role
-- [ ] Admin can deactivate or delete user accounts
-- [ ] Changes reflect immediately in the system
+- [x] Admin can view all registered users with details (name, email, role)
+- [x] Admin can update user information or role
+- [x] Admin can deactivate or delete user accounts
+- [x] Changes reflect immediately in the system
 
 **Status:** ❌ Not Started
 
@@ -206,9 +206,9 @@
 **So that** I can prevent overselling and maintain inventory  
 
 **Acceptance Criteria:**
-- [ ] Admin sees current stock for all products
-- [ ] Admin can update stock quantity
-- [ ] Low-stock alerts are displayed
+- [x] Admin sees current stock for all products
+- [x] Admin can update stock quantity
+- [x] Low-stock alerts are displayed
 
 **Status:** ❌ Not Started
 
@@ -220,8 +220,8 @@
 **So that** products are organized for easier browsing  
 
 **Acceptance Criteria:**
-- [ ] Admin can create, edit, and delete categories
-- [ ] Admin can assign products to multiple categories
+- [x] Admin can create, edit, and delete categories
+- [x] Admin can assign products to multiple categories
 - [ ] Admin can create, edit, and delete product tags
 
 **Status:** ❌ Not Started
@@ -248,7 +248,7 @@
 **So that** I can understand store performance  
 
 **Acceptance Criteria:**
-- [ ] Admin can view total sales, revenue, and profits
+- [x] Admin can view total sales, revenue, and profits
 - [ ] Admin can see top-selling products
 - [ ] Admin can export reports as CSV or PDF
 
@@ -263,7 +263,7 @@
 
 **Acceptance Criteria:**
 - [ ] Admin can view and respond to customer messages
-- [ ] Admin can issue refunds or process returns
+- [x] Admin can issue refunds or process returns
 
 **Status:** ❌ Not Started
 
@@ -275,8 +275,8 @@
 **So that** I can control access for other admin users  
 
 **Acceptance Criteria:**
-- [ ] Admin can assign roles (e.g., admin, manager, support)
-- [ ] Admin can control which features each role can access
+- [x] Admin can assign roles (e.g., admin, manager, support)
+- [x] Admin can control which features each role can access
 
 **Status:** ❌ Not Started
 
@@ -303,7 +303,7 @@
 **Acceptance Criteria:**
 - [ ] Admin can monitor suspicious login attempts
 - [ ] Admin can force password resets
-- [ ] Admin can deactivate or ban users
+- [x] Admin can deactivate or ban users
 
 **Status:** ❌ Not Started
 
@@ -315,8 +315,8 @@
 **So that** orders are delivered efficiently  
 
 **Acceptance Criteria:**
-- [ ] Admin can add/edit shipping methods and costs
+- [x] Admin can add/edit shipping methods and costs
 - [ ] Admin can update tracking information
-- [ ] Admin can automatically change order status when shipped
+- [x] Admin can automatically change order status when shipped
 
 **Status:** ❌ Not Started
